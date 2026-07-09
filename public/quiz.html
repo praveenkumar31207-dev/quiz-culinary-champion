@@ -636,11 +636,12 @@
     answered = false;
     const q = questions[currentIndex];
 
-    // Meta row: category + score
+    // Meta row: category + difficulty + score
     const meta = el("div", { class: "meta-row" });
-    const cat = el("span", { class: "category-chip diff-" + (q.difficulty || difficulty), text: q.category + " · " + (q.difficulty || difficulty).toUpperCase() });
+    const cat = el("span", { class: "category-chip", text: q.category });
+    const diff = el("span", { class: "category-chip diff-chip diff-" + (q.difficulty || difficulty), text: (q.difficulty || difficulty).toUpperCase() });
     const scoreLine = el("span", { class: "score-line", text: `Score: ${score}` });
-    meta.append(cat, scoreLine);
+    meta.append(cat, diff, scoreLine);
 
     // Progress dots
     const dots = el("div", { class: "progress-dots" });
