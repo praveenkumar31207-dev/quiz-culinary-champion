@@ -321,11 +321,89 @@
     margin-left: 6px;
   }
 
+  /* Category picker */
+  .cat-group {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+    max-width: 500px; margin: 0 auto 6px;
+  }
+  .cat-chip {
+    cursor: pointer;
+    font-family: 'Special Elite', monospace;
+    font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
+    background: transparent; color: var(--chalk-dim);
+    border: 2px dashed var(--chalk-dim);
+    border-radius: 20px; padding: 6px 14px;
+    transition: all 0.15s ease;
+  }
+  .cat-chip:hover { color: var(--chalk); border-color: var(--chalk); }
+  .cat-chip.selected {
+    border-style: solid; color: var(--board);
+    background: var(--chalk-yellow); border-color: var(--chalk-yellow);
+  }
+
+  /* Level grid */
+  .level-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    max-width: 520px;
+    margin: 4px auto 10px;
+  }
+  .level-btn {
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 18px;
+    background: transparent;
+    color: var(--chalk);
+    border: 2px dashed rgba(245,241,230,0.35);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: all 0.15s ease;
+  }
+  .level-btn:hover:not(:disabled) {
+    border-color: var(--chalk-yellow); color: var(--chalk-yellow);
+    transform: translateY(-1px);
+  }
+  .level-btn.cleared {
+    border-style: solid;
+    border-color: var(--chalk-green);
+    color: var(--chalk-green);
+    background: rgba(126,217,87,0.10);
+  }
+  .level-btn.current {
+    border-style: solid;
+    border-color: var(--chalk-yellow);
+    color: var(--chalk-yellow);
+    background: rgba(245,215,110,0.16);
+    box-shadow: 0 0 0 2px rgba(245,215,110,0.25);
+  }
+  .level-btn:disabled {
+    opacity: 0.35; cursor: not-allowed;
+    color: var(--chalk-dim); border-color: rgba(245,241,230,0.15);
+  }
+  .level-hint {
+    text-align: center; font-family: 'Caveat', cursive;
+    color: var(--chalk-dim); font-size: 17px; margin: 2px 0 10px;
+  }
+  .level-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    max-width: 520px; margin: 0 auto 4px;
+    font-family: 'Caveat', cursive; color: var(--chalk-dim); font-size: 18px;
+  }
+  .level-header strong { color: var(--chalk-yellow); font-family: 'Shadows Into Light', cursive; font-size: 22px; }
+
+  @media (max-width: 520px) {
+    .level-grid { grid-template-columns: repeat(6, 1fr); }
+  }
   @media (max-width: 420px) {
     .frame { padding: 10px; }
     .board { padding: 22px 16px 18px; }
     .option { font-size: 15px; }
     .diff-group { grid-template-columns: 1fr; }
+    .level-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+    .level-btn { font-size: 16px; }
   }
 </style>
 </head>
@@ -521,15 +599,22 @@
     }
   ];
 
-  const QUIZ_LENGTH = 8; // questions per round (per difficulty)
 
-  // ---- State (kept in JS, NOT the DOM) ----
+  const QUIZ_LENGTH = 5;      // questions per level
+  const TOTAL_LEVELS = 50;
+
+  // ---- State (in-memory only) ----
   let questions = [];
   let currentIndex = 0;
   let score = 0;
   let answered = false;
-  let results = []; // {correct: bool}
+  let results = [];
   let difficulty = "medium";
+  let currentLevel = 1;
+  const ALL_CATEGORIES = ["World Cuisine", "Nutrition", "Food Science"];
+  let selectedCategories = new Set(ALL_CATEGORIES);
+  // Highest level unlocked per difficulty (session only)
+  const unlocked = { easy: 1, medium: 1, hard: 1 };
 
   const DIFFICULTIES = [
     { key: "easy",   label: "Easy",   blurb: "Warm‑up bites" },
@@ -549,6 +634,33 @@
     return a;
   }
 
+  // Seeded shuffle (mulberry32) so a given (difficulty, level, cats) produces a stable set
+  function seededShuffle(arr, seed) {
+    const a = arr.slice();
+    let t = seed >>> 0;
+    function rnd() {
+      t += 0x6D2B79F5;
+      let x = t;
+      x = Math.imul(x ^ (x >>> 15), x | 1);
+      x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+      return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+    }
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function hashStr(s) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
   function el(tag, opts = {}, children = []) {
     const node = document.createElement(tag);
     if (opts.class) node.className = opts.class;
@@ -563,6 +675,28 @@
     while (board.firstChild) board.removeChild(board.firstChild);
   }
 
+  function filteredPool(diffKey) {
+    return QUESTIONS.filter(q =>
+      q.difficulty === diffKey && selectedCategories.has(q.category)
+    );
+  }
+
+  // Build a stable, unique-feeling 5-question set for a given level.
+  // Cycles through the pool with an offset so each level differs.
+  function buildLevelQuestions(diffKey, level) {
+    const pool = filteredPool(diffKey);
+    if (pool.length === 0) return [];
+    const catsKey = Array.from(selectedCategories).sort().join("|");
+    const seed = hashStr(diffKey + "#" + catsKey + "#L" + level);
+    const shuffled = seededShuffle(pool, seed);
+    const need = Math.min(QUIZ_LENGTH, Math.max(3, pool.length));
+    const out = [];
+    for (let i = 0; i < need; i++) {
+      out.push(shuffled[(i + (level - 1) * 2) % shuffled.length]);
+    }
+    return out;
+  }
+
   // ---- Screens ----
   function renderStart() {
     clearBoard();
@@ -571,7 +705,32 @@
     const hr = el("hr", { class: "rule" });
     const desc = el("p", {
       class: "description",
-      text: "Test your palate across world cuisines, nutrition and food science. Pick your difficulty — questions and answers are shuffled every round."
+      text: "Pick your categories, choose a difficulty, and work through 50 levels of tasty trivia."
+    });
+
+    // Category picker
+    const catLabel = el("p", { class: "diff-label", text: "Categories" });
+    const catWrap = el("div", { class: "cat-group", attrs: { role: "group", "aria-label": "Categories" } });
+    const catButtons = [];
+    ALL_CATEGORIES.forEach(name => {
+      const chip = el("button", {
+        class: "cat-chip" + (selectedCategories.has(name) ? " selected" : ""),
+        attrs: { type: "button", "aria-pressed": selectedCategories.has(name) ? "true" : "false" },
+        text: name,
+        on: {
+          click: () => {
+            if (selectedCategories.has(name)) {
+              if (selectedCategories.size === 1) return; // keep at least one
+              selectedCategories.delete(name);
+            } else {
+              selectedCategories.add(name);
+            }
+            renderStart(); // re-render to refresh level counts/labels
+          }
+        }
+      });
+      catButtons.push(chip);
+      catWrap.appendChild(chip);
     });
 
     // Difficulty picker
@@ -579,49 +738,69 @@
     const diffWrap = el("div", { class: "diff-group", attrs: { role: "radiogroup", "aria-label": "Difficulty" } });
     const diffButtons = [];
     DIFFICULTIES.forEach(d => {
-      const count = QUESTIONS.filter(q => q.difficulty === d.key).length;
+      const pool = filteredPool(d.key);
       const btn = el("button", {
         class: "diff-btn" + (d.key === difficulty ? " selected" : ""),
         attrs: { type: "button", "data-diff": d.key, "aria-pressed": d.key === difficulty ? "true" : "false" },
         on: {
           click: () => {
             difficulty = d.key;
-            diffButtons.forEach(b => {
-              const sel = b.getAttribute("data-diff") === difficulty;
-              b.classList.toggle("selected", sel);
-              b.setAttribute("aria-pressed", sel ? "true" : "false");
-            });
+            renderStart();
           }
         }
       }, [
         el("span", { class: "diff-name", text: d.label }),
         el("span", { class: "diff-blurb", text: d.blurb }),
-        el("span", { class: "diff-count", text: count + " Qs" })
+        el("span", { class: "diff-count", text: pool.length + " Qs · Lv " + unlocked[d.key] + "/" + TOTAL_LEVELS })
       ]);
       diffButtons.push(btn);
       diffWrap.appendChild(btn);
     });
 
-    const btnWrap = el("div", { class: "center" });
-    const startBtn = el("button", {
-      class: "btn",
-      text: "Start Quiz",
-      on: { click: startGame }
-    });
-    btnWrap.appendChild(startBtn);
+    // Level grid header
+    const header = el("div", { class: "level-header" }, [
+      el("span", { text: "Select a level" }),
+      el("span", {}, [
+        document.createTextNode("Unlocked: "),
+        el("strong", { text: unlocked[difficulty] + " / " + TOTAL_LEVELS })
+      ])
+    ]);
 
-    const note = el("p", {
-      class: "footer-note",
-      text: "Chef's tip: read every option before choosing."
+    // Level grid
+    const pool = filteredPool(difficulty);
+    const grid = el("div", { class: "level-grid", attrs: { role: "list", "aria-label": "Levels" } });
+    for (let lv = 1; lv <= TOTAL_LEVELS; lv++) {
+      const isUnlocked = lv <= unlocked[difficulty] && pool.length > 0;
+      const isCleared = lv < unlocked[difficulty];
+      const isCurrent = lv === unlocked[difficulty] && pool.length > 0;
+      const b = el("button", {
+        class: "level-btn" + (isCleared ? " cleared" : "") + (isCurrent ? " current" : ""),
+        text: String(lv),
+        attrs: { type: "button", "aria-label": "Level " + lv, ...(isUnlocked ? {} : { disabled: "true" }) },
+        on: {
+          click: () => {
+            if (!isUnlocked) return;
+            currentLevel = lv;
+            startGame();
+          }
+        }
+      });
+      grid.appendChild(b);
+    }
+
+    const hint = el("p", {
+      class: "level-hint",
+      text: pool.length === 0
+        ? "No questions match your category picks for this difficulty — try adding a category."
+        : "Clear a level to unlock the next. Answers shuffle every round."
     });
 
-    board.append(title, sub, hr, desc, diffLabel, diffWrap, btnWrap, note);
+    board.append(title, sub, hr, desc, catLabel, catWrap, diffLabel, diffWrap, header, grid, hint);
   }
 
   function startGame() {
-    // Filter by difficulty, shuffle, then cap length
-    const pool = QUESTIONS.filter(q => q.difficulty === difficulty);
-    const chosen = shuffle(pool).slice(0, Math.min(QUIZ_LENGTH, pool.length));
+    const chosen = buildLevelQuestions(difficulty, currentLevel);
+    if (chosen.length === 0) { renderStart(); return; }
     questions = chosen.map(q => {
       const indices = shuffle(q.options.map((_, i) => i));
       return {
@@ -645,7 +824,7 @@
     // Meta row: category + difficulty + score
     const meta = el("div", { class: "meta-row" });
     const cat = el("span", { class: "category-chip", text: q.category });
-    const diff = el("span", { class: "category-chip diff-chip diff-" + (q.difficulty || difficulty), text: (q.difficulty || difficulty).toUpperCase() });
+    const diff = el("span", { class: "category-chip diff-chip diff-" + (q.difficulty || difficulty), text: "LV " + currentLevel + " · " + (q.difficulty || difficulty).toUpperCase() });
     const scoreLine = el("span", { class: "score-line", text: `Score: ${score}` });
     meta.append(cat, diff, scoreLine);
 
@@ -750,15 +929,24 @@
     const correct = score;
     const wrong = total - correct;
     const pct = Math.round((correct / total) * 100);
+    const passed = pct >= 60; // 3/5 or better clears the level
+    const isLastLevel = currentLevel >= TOTAL_LEVELS;
+
+    // Unlock next level on pass
+    let newlyUnlocked = false;
+    if (passed && !isLastLevel && unlocked[difficulty] === currentLevel) {
+      unlocked[difficulty] = currentLevel + 1;
+      newlyUnlocked = true;
+    }
 
     let verdict;
-    if (pct === 100) verdict = "Perfect score! Michelin‑star mind. ⭐";
+    if (pct === 100) verdict = "Perfect plate! Michelin‑star mind. ⭐";
     else if (pct >= 80) verdict = "Executive chef material — very well done!";
     else if (pct >= 60) verdict = "Solid sous‑chef performance.";
-    else if (pct >= 40) verdict = "Still prepping — keep tasting!";
-    else verdict = "Back to culinary school. Try again!";
+    else if (pct >= 40) verdict = "Still prepping — need 60% to clear.";
+    else verdict = "Back to culinary school — need 60% to clear.";
 
-    const title = el("h2", { class: "results-title", text: "Order Up!" });
+    const title = el("h2", { class: "results-title", text: passed ? ("Level " + currentLevel + " Cleared!") : ("Level " + currentLevel) });
     const big = el("div", { class: "big-score" });
     big.append(document.createTextNode(pct + "%"));
     big.appendChild(el("small", { text: ` (${correct}/${total})` }));
@@ -780,15 +968,29 @@
       ])
     ]);
 
-    const actions = el("div", { class: "actions" }, [
-      el("button", {
+    const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } });
+    if (passed && !isLastLevel) {
+      actions.appendChild(el("button", {
         class: "btn",
-        text: "Play Again",
-        on: { click: renderStart }
-      })
-    ]);
+        text: "Next Level →",
+        on: { click: () => { currentLevel += 1; startGame(); } }
+      }));
+    }
+    actions.appendChild(el("button", {
+      class: "btn",
+      text: passed ? "Replay Level" : "Try Again",
+      on: { click: startGame }
+    }));
+    actions.appendChild(el("button", {
+      class: "btn",
+      text: "Level Select",
+      on: { click: renderStart }
+    }));
 
-    const note = el("p", { class: "footer-note", text: "Questions and answers are shuffled every round." });
+    const noteText = isLastLevel && passed
+      ? "You cleared every level on " + difficulty + " — chef's hat earned! 🎩"
+      : (newlyUnlocked ? ("Level " + (currentLevel + 1) + " unlocked!") : "Score 60% or higher to unlock the next level.");
+    const note = el("p", { class: "footer-note", text: noteText });
 
     board.append(title, big, v, stats, actions, note);
   }
