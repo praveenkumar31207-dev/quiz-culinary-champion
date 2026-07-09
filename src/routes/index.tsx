@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Test your palate of knowledge across world cuisines, nutrition and food science.",
+          "A tasty 12-question food trivia quiz on world cuisines, nutrition, and food science — served on a chalkboard menu.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
