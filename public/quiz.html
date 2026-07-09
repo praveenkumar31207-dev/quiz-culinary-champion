@@ -477,6 +477,13 @@
   let score = 0;
   let answered = false;
   let results = []; // {correct: bool}
+  let difficulty = "medium";
+
+  const DIFFICULTIES = [
+    { key: "easy",   label: "Easy",   blurb: "Warm‑up bites" },
+    { key: "medium", label: "Medium", blurb: "Chef's choice" },
+    { key: "hard",   label: "Hard",   blurb: "Tasting menu" }
+  ];
 
   const board = document.getElementById("board");
 
@@ -512,8 +519,37 @@
     const hr = el("hr", { class: "rule" });
     const desc = el("p", {
       class: "description",
-      text: "Test your palate of knowledge across world cuisines, nutrition and food science. 12 questions. No pressure — just flavor."
+      text: "Test your palate across world cuisines, nutrition and food science. Pick your difficulty — questions and answers are shuffled every round."
     });
+
+    // Difficulty picker
+    const diffLabel = el("p", { class: "diff-label", text: "Choose your difficulty" });
+    const diffWrap = el("div", { class: "diff-group", attrs: { role: "radiogroup", "aria-label": "Difficulty" } });
+    const diffButtons = [];
+    DIFFICULTIES.forEach(d => {
+      const count = QUESTIONS.filter(q => q.difficulty === d.key).length;
+      const btn = el("button", {
+        class: "diff-btn" + (d.key === difficulty ? " selected" : ""),
+        attrs: { type: "button", "data-diff": d.key, "aria-pressed": d.key === difficulty ? "true" : "false" },
+        on: {
+          click: () => {
+            difficulty = d.key;
+            diffButtons.forEach(b => {
+              const sel = b.getAttribute("data-diff") === difficulty;
+              b.classList.toggle("selected", sel);
+              b.setAttribute("aria-pressed", sel ? "true" : "false");
+            });
+          }
+        }
+      }, [
+        el("span", { class: "diff-name", text: d.label }),
+        el("span", { class: "diff-blurb", text: d.blurb }),
+        el("span", { class: "diff-count", text: count + " Qs" })
+      ]);
+      diffButtons.push(btn);
+      diffWrap.appendChild(btn);
+    });
+
     const btnWrap = el("div", { class: "center" });
     const startBtn = el("button", {
       class: "btn",
@@ -527,12 +563,14 @@
       text: "Chef's tip: read every option before choosing."
     });
 
-    board.append(title, sub, hr, desc, btnWrap, note);
+    board.append(title, sub, hr, desc, diffLabel, diffWrap, btnWrap, note);
   }
 
   function startGame() {
-    // Shuffle questions and each question's options while preserving correct answer
-    questions = shuffle(QUESTIONS).map(q => {
+    // Filter by difficulty, shuffle, then cap length
+    const pool = QUESTIONS.filter(q => q.difficulty === difficulty);
+    const chosen = shuffle(pool).slice(0, Math.min(QUIZ_LENGTH, pool.length));
+    questions = chosen.map(q => {
       const indices = shuffle(q.options.map((_, i) => i));
       return {
         ...q,
