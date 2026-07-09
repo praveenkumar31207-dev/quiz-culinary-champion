@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Food Trivia — Chalkboard Menu Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Shadows+Into+Light&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --chalk: #f5f1e6;
+    --chalk-dim: #d9d2bd;
+    --chalk-yellow: #f5d76e;
+    --chalk-green: #7ed957;
+    --chalk-red: #ff6b6b;
+    --board: #1f3a2e;
+    --board-dark: #142720;
+    --frame: #6b3f1d;
+    --frame-dark: #3d240f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100%; }
+  body {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    background:
+      radial-gradient(ellipse at center, #2a1a0e 0%, #140a04 100%);
+    color: var(--chalk);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .frame {
+    width: 100%;
+    max-width: 640px;
+    padding: 16px;
+    border-radius: 14px;
+    background:
+      repeating-linear-gradient(45deg, var(--frame) 0 8px, var(--frame-dark) 8px 16px);
+    box-shadow:
+      0 20px 50px rgba(0,0,0,0.6),
+      inset 0 0 0 3px #2a180a;
+  }
+  .board {
+    position: relative;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255,255,255,0.05), transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(255,255,255,0.04), transparent 60%),
+      linear-gradient(180deg, var(--board) 0%, var(--board-dark) 100%);
+    border-radius: 8px;
+    padding: 28px 22px 22px;
+    min-height: 520px;
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.05);
+    overflow: hidden;
+  }
+  .board::before {
+    /* chalk dust */
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+      radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 3px 3px, 7px 7px;
+    background-position: 0 0, 1px 2px;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .title {
+    font-family: 'Shadows Into Light', cursive;
+    font-size: clamp(36px, 8vw, 54px);
+    color: var(--chalk-yellow);
+    text-align: center;
+    margin: 0 0 4px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 1px rgba(255,255,255,0.4);
+  }
+  .subtitle {
+    font-family: 'Caveat', cursive;
+    text-align: center;
+    color: var(--chalk-dim);
+    font-size: 22px;
+    margin: 0 0 22px;
+  }
+  .rule {
+    border: none;
+    border-top: 2px dashed rgba(245,241,230,0.25);
+    margin: 14px 0 18px;
+  }
+  .description {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--chalk);
+    text-align: center;
+    margin: 0 auto 22px;
+    max-width: 460px;
+  }
+  .btn {
+    font-family: 'Shadows Into Light', cursive;
+    background: transparent;
+    color: var(--chalk-yellow);
+    border: 2px solid var(--chalk-yellow);
+    padding: 12px 26px;
+    font-size: 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease;
+  }
+  .btn:hover { background: var(--chalk-yellow); color: #2a1a0e; transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .center { text-align: center; }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    color: var(--chalk-dim);
+    margin-bottom: 10px;
+  }
+  .category-chip {
+    display: inline-block;
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 18px;
+    color: var(--board);
+    background: var(--chalk-yellow);
+    padding: 2px 12px;
+    border-radius: 20px;
+    transform: rotate(-2deg);
+  }
+  .progress-dots {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    justify-content: center;
+    margin: 6px 0 18px;
+  }
+  .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid var(--chalk-dim);
+    background: transparent;
+  }
+  .dot.done { background: var(--chalk-yellow); border-color: var(--chalk-yellow); }
+  .dot.correct { background: var(--chalk-green); border-color: var(--chalk-green); }
+  .dot.wrong { background: var(--chalk-red); border-color: var(--chalk-red); }
+  .dot.current { box-shadow: 0 0 0 3px rgba(245,215,110,0.3); }
+
+  .question {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(26px, 5.5vw, 34px);
+    line-height: 1.25;
+    color: var(--chalk);
+    margin: 6px 0 18px;
+    text-align: center;
+  }
+  .options {
+    display: grid; gap: 10px;
+  }
+  .option {
+    font-family: 'Special Elite', monospace;
+    font-size: 16px;
+    text-align: left;
+    background: transparent;
+    color: var(--chalk);
+    border: 2px dashed rgba(245,241,230,0.4);
+    border-radius: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--chalk-yellow); background: rgba(245,215,110,0.08); }
+  .option:disabled { cursor: default; }
+  .option .letter {
+    display: inline-flex;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: rgba(245,241,230,0.15);
+    align-items: center; justify-content: center;
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .option.correct {
+    border-color: var(--chalk-green);
+    background: rgba(126,217,87,0.18);
+    color: #d5ffb8;
+    animation: pop 0.35s ease;
+  }
+  .option.wrong {
+    border-color: var(--chalk-red);
+    background: rgba(255,107,107,0.16);
+    color: #ffd4d4;
+    animation: shake 0.35s ease;
+  }
+  @keyframes pop { 0%{transform:scale(1);} 40%{transform:scale(1.03);} 100%{transform:scale(1);} }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
+
+  .fun-fact {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: rgba(245,241,230,0.08);
+    border-left: 4px solid var(--chalk-yellow);
+    border-radius: 4px;
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    line-height: 1.35;
+    color: var(--chalk);
+  }
+  .fun-fact strong { color: var(--chalk-yellow); font-family: 'Shadows Into Light', cursive; font-size: 22px; }
+
+  .actions { margin-top: 18px; text-align: center; }
+
+  .score-line {
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 22px;
+    color: var(--chalk-yellow);
+  }
+
+  .results-title {
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 44px;
+    color: var(--chalk-yellow);
+    text-align: center;
+    margin: 6px 0 4px;
+  }
+  .big-score {
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 88px;
+    text-align: center;
+    color: var(--chalk);
+    line-height: 1;
+    margin: 8px 0;
+    text-shadow: 0 0 1px rgba(255,255,255,0.4);
+  }
+  .big-score small { font-size: 28px; color: var(--chalk-dim); }
+  .verdict {
+    font-family: 'Caveat', cursive;
+    font-size: 26px;
+    text-align: center;
+    color: var(--chalk);
+    margin: 8px 0 16px;
+  }
+  .stat-row {
+    display: flex; justify-content: space-around;
+    margin: 10px 0 18px;
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+  }
+  .stat { text-align: center; }
+  .stat .num { display:block; font-family: 'Shadows Into Light', cursive; font-size: 34px; }
+  .stat.correct .num { color: var(--chalk-green); }
+  .stat.wrong .num { color: var(--chalk-red); }
+  .stat.total .num { color: var(--chalk-yellow); }
+
+  .hidden { display: none !important; }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 14px;
+    font-family: 'Caveat', cursive;
+    color: var(--chalk-dim);
+    font-size: 18px;
+  }
+
+  @media (max-width: 420px) {
+    .frame { padding: 10px; }
+    .board { padding: 22px 16px 18px; }
+    .option { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="board" id="board">
+      <!-- Screens are injected here by JS -->
+    </div>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  const QUESTIONS = [
+    {
+      category: "World Cuisine",
+      question: "Which country is the birthplace of sushi?",
+      options: ["China", "Japan", "Korea", "Thailand"],
+      answer: 1,
+      fact: "Sushi originated as a preservation method in Southeast Asia, but modern nigiri sushi was perfected in 19th‑century Edo (Tokyo)."
+    },
+    {
+      category: "World Cuisine",
+      question: "Paella is a traditional rice dish from which region?",
+      options: ["Tuscany, Italy", "Valencia, Spain", "Provence, France", "Lisbon, Portugal"],
+      answer: 1,
+      fact: "Authentic Valencian paella traditionally uses rabbit, chicken and snails — no seafood!"
+    },
+    {
+      category: "World Cuisine",
+      question: "Which spice gives curry its signature yellow color?",
+      options: ["Cumin", "Paprika", "Turmeric", "Saffron"],
+      answer: 2,
+      fact: "Turmeric contains curcumin, a compound studied for its anti‑inflammatory properties."
+    },
+    {
+      category: "World Cuisine",
+      question: "Kimchi is a staple fermented dish from which country?",
+      options: ["Vietnam", "Japan", "Korea", "China"],
+      answer: 2,
+      fact: "There are over 180 recognized varieties of kimchi in Korea."
+    },
+    {
+      category: "Nutrition",
+      question: "Which vitamin is produced when your skin is exposed to sunlight?",
+      options: ["Vitamin A", "Vitamin B12", "Vitamin C", "Vitamin D"],
+      answer: 3,
+      fact: "Just 10–20 minutes of midday sun can produce enough vitamin D for the day for many people."
+    },
+    {
+      category: "Nutrition",
+      question: "Which of these foods is the richest source of potassium per serving?",
+      options: ["Banana", "Sweet potato", "Spinach", "Avocado"],
+      answer: 1,
+      fact: "A medium sweet potato has roughly 540mg of potassium — more than a banana's ~420mg."
+    },
+    {
+      category: "Nutrition",
+      question: "How many calories are in 1 gram of fat?",
+      options: ["4", "7", "9", "12"],
+      answer: 2,
+      fact: "Fat packs 9 kcal/g, more than double carbs and protein (4 kcal/g each). Alcohol sits at 7 kcal/g."
+    },
+    {
+      category: "Nutrition",
+      question: "Which nutrient is the body's preferred source of quick energy?",
+      options: ["Protein", "Carbohydrates", "Fat", "Fiber"],
+      answer: 1,
+      fact: "Carbs break down into glucose, the primary fuel for your brain and muscles during exercise."
+    },
+    {
+      category: "Food Science",
+      question: "The Maillard reaction is responsible for what?",
+      options: ["Fermentation of bread", "Browning of seared meat", "Curdling of milk", "Souring of yogurt"],
+      answer: 1,
+      fact: "The Maillard reaction happens between amino acids and reducing sugars above ~140°C — it's why seared steak and toast taste so good."
+    },
+    {
+      category: "Food Science",
+      question: "What causes bread dough to rise?",
+      options: ["Baking soda", "Yeast producing CO₂", "Salt reacting with flour", "Water evaporating"],
+      answer: 1,
+      fact: "Yeast eats sugars and releases carbon dioxide and ethanol — the CO₂ inflates the gluten network."
+    },
+    {
+      category: "Food Science",
+      question: "Why do onions make you cry?",
+      options: [
+        "Their smell irritates the eyes",
+        "They release a sulfur gas that becomes sulfuric acid on your eye",
+        "They contain capsaicin",
+        "They release histamine"
+      ],
+      answer: 1,
+      fact: "Cutting onions releases syn‑propanethial‑S‑oxide, which reacts with the water in your eyes to form a mild sulfuric acid."
+    },
+    {
+      category: "Food Science",
+      question: "What is the process of converting sugar into alcohol called?",
+      options: ["Oxidation", "Fermentation", "Emulsification", "Pasteurization"],
+      answer: 1,
+      fact: "Fermentation by yeast is the basis of beer, wine, sake, and even sourdough bread."
+    }
+  ];
+
+  // ---- State (kept in JS, NOT the DOM) ----
+  let questions = [];
+  let currentIndex = 0;
+  let score = 0;
+  let answered = false;
+  let results = []; // {correct: bool}
+
+  const board = document.getElementById("board");
+
+  // ---- Utilities ----
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function el(tag, opts = {}, children = []) {
+    const node = document.createElement(tag);
+    if (opts.class) node.className = opts.class;
+    if (opts.text != null) node.textContent = opts.text;
+    if (opts.attrs) for (const k in opts.attrs) node.setAttribute(k, opts.attrs[k]);
+    if (opts.on) for (const evt in opts.on) node.addEventListener(evt, opts.on[evt]);
+    for (const c of children) if (c) node.appendChild(c);
+    return node;
+  }
+
+  function clearBoard() {
+    while (board.firstChild) board.removeChild(board.firstChild);
+  }
+
+  // ---- Screens ----
+  function renderStart() {
+    clearBoard();
+    const title = el("h1", { class: "title", text: "The Daily Special" });
+    const sub = el("p", { class: "subtitle", text: "~ Food Trivia Quiz ~" });
+    const hr = el("hr", { class: "rule" });
+    const desc = el("p", {
+      class: "description",
+      text: "Test your palate of knowledge across world cuisines, nutrition and food science. 12 questions. No pressure — just flavor."
+    });
+    const btnWrap = el("div", { class: "center" });
+    const startBtn = el("button", {
+      class: "btn",
+      text: "Start Quiz",
+      on: { click: startGame }
+    });
+    btnWrap.appendChild(startBtn);
+
+    const note = el("p", {
+      class: "footer-note",
+      text: "Chef's tip: read every option before choosing."
+    });
+
+    board.append(title, sub, hr, desc, btnWrap, note);
+  }
+
+  function startGame() {
+    // Shuffle questions and each question's options while preserving correct answer
+    questions = shuffle(QUESTIONS).map(q => {
+      const indices = shuffle(q.options.map((_, i) => i));
+      return {
+        ...q,
+        options: indices.map(i => q.options[i]),
+        answer: indices.indexOf(q.answer)
+      };
+    });
+    currentIndex = 0;
+    score = 0;
+    answered = false;
+    results = [];
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    clearBoard();
+    answered = false;
+    const q = questions[currentIndex];
+
+    // Meta row: category + score
+    const meta = el("div", { class: "meta-row" });
+    const cat = el("span", { class: "category-chip", text: q.category });
+    const scoreLine = el("span", { class: "score-line", text: `Score: ${score}` });
+    meta.append(cat, scoreLine);
+
+    // Progress dots
+    const dots = el("div", { class: "progress-dots" });
+    for (let i = 0; i < questions.length; i++) {
+      const d = el("span", { class: "dot" });
+      if (i < results.length) {
+        d.classList.add(results[i].correct ? "correct" : "wrong");
+      } else if (i === currentIndex) {
+        d.classList.add("current");
+      }
+      dots.appendChild(d);
+    }
+
+    const progressText = el("div", {
+      class: "center",
+      attrs: { style: "font-family:'Caveat',cursive;color:var(--chalk-dim);font-size:18px;margin-bottom:4px;" },
+      text: `Question ${currentIndex + 1} of ${questions.length}`
+    });
+
+    const questionEl = el("div", { class: "question", text: q.question });
+
+    const optionsWrap = el("div", { class: "options" });
+    const letters = ["A", "B", "C", "D"];
+    const buttons = [];
+    q.options.forEach((opt, i) => {
+      const btn = el("button", {
+        class: "option",
+        on: { click: () => handleAnswer(i, buttons, q) }
+      }, [
+        el("span", { class: "letter", text: letters[i] }),
+        el("span", { text: opt })
+      ]);
+      optionsWrap.appendChild(btn);
+      buttons.push(btn);
+    });
+
+    const actions = el("div", { class: "actions" });
+    // Next button hidden until answered
+    const nextBtn = el("button", {
+      class: "btn hidden",
+      text: currentIndex === questions.length - 1 ? "See Results" : "Next Question",
+      attrs: { id: "next-btn" },
+      on: { click: nextQuestion }
+    });
+    actions.appendChild(nextBtn);
+
+    board.append(meta, progressText, dots, questionEl, optionsWrap, actions);
+  }
+
+  function handleAnswer(selectedIdx, buttons, q) {
+    if (answered) return;
+    answered = true;
+    const isCorrect = selectedIdx === q.answer;
+    if (isCorrect) score += 1;
+    results.push({ correct: isCorrect });
+
+    buttons.forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.answer) btn.classList.add("correct");
+      else if (i === selectedIdx) btn.classList.add("wrong");
+    });
+
+    // Fun fact
+    const fact = el("div", { class: "fun-fact" }, [
+      el("strong", { text: isCorrect ? "Correct! " : "Not quite. " }),
+      el("span", { text: q.fact })
+    ]);
+    // Insert before actions
+    const actions = board.querySelector(".actions");
+    board.insertBefore(fact, actions);
+
+    // Update score line
+    const scoreLine = board.querySelector(".score-line");
+    if (scoreLine) scoreLine.textContent = `Score: ${score}`;
+
+    // Update current dot
+    const dots = board.querySelectorAll(".dot");
+    if (dots[currentIndex]) {
+      dots[currentIndex].classList.remove("current");
+      dots[currentIndex].classList.add(isCorrect ? "correct" : "wrong");
+    }
+
+    // Reveal next button
+    const nextBtn = document.getElementById("next-btn");
+    if (nextBtn) nextBtn.classList.remove("hidden");
+  }
+
+  function nextQuestion() {
+    if (currentIndex < questions.length - 1) {
+      currentIndex += 1;
+      renderQuestion();
+    } else {
+      renderResults();
+    }
+  }
+
+  function renderResults() {
+    clearBoard();
+    const total = questions.length;
+    const correct = score;
+    const wrong = total - correct;
+    const pct = Math.round((correct / total) * 100);
+
+    let verdict;
+    if (pct === 100) verdict = "Perfect score! Michelin‑star mind. ⭐";
+    else if (pct >= 80) verdict = "Executive chef material — very well done!";
+    else if (pct >= 60) verdict = "Solid sous‑chef performance.";
+    else if (pct >= 40) verdict = "Still prepping — keep tasting!";
+    else verdict = "Back to culinary school. Try again!";
+
+    const title = el("h2", { class: "results-title", text: "Order Up!" });
+    const big = el("div", { class: "big-score" });
+    big.append(document.createTextNode(pct + "%"));
+    big.appendChild(el("small", { text: ` (${correct}/${total})` }));
+
+    const v = el("p", { class: "verdict", text: verdict });
+
+    const stats = el("div", { class: "stat-row" }, [
+      el("div", { class: "stat total" }, [
+        el("span", { class: "num", text: String(total) }),
+        el("span", { text: "Questions" })
+      ]),
+      el("div", { class: "stat correct" }, [
+        el("span", { class: "num", text: String(correct) }),
+        el("span", { text: "Correct" })
+      ]),
+      el("div", { class: "stat wrong" }, [
+        el("span", { class: "num", text: String(wrong) }),
+        el("span", { text: "Incorrect" })
+      ])
+    ]);
+
+    const actions = el("div", { class: "actions" }, [
+      el("button", {
+        class: "btn",
+        text: "Play Again",
+        on: { click: renderStart }
+      })
+    ]);
+
+    const note = el("p", { class: "footer-note", text: "Questions and answers are shuffled every round." });
+
+    board.append(title, big, v, stats, actions, note);
+  }
+
+  // Boot
+  renderStart();
+})();
+</script>
+</body>
+</html>
