@@ -638,7 +638,7 @@
 
     // Meta row: category + score
     const meta = el("div", { class: "meta-row" });
-    const cat = el("span", { class: "category-chip", text: q.category });
+    const cat = el("span", { class: "category-chip diff-" + (q.difficulty || difficulty), text: q.category + " · " + (q.difficulty || difficulty).toUpperCase() });
     const scoreLine = el("span", { class: "score-line", text: `Score: ${score}` });
     meta.append(cat, scoreLine);
 
