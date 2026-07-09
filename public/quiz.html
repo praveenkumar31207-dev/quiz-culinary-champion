@@ -270,10 +270,56 @@
     font-size: 18px;
   }
 
+  .diff-label {
+    text-align: center;
+    font-family: 'Caveat', cursive;
+    color: var(--chalk-dim);
+    font-size: 20px;
+    margin: 18px 0 8px;
+  }
+  .diff-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 0 auto 18px;
+    max-width: 460px;
+  }
+  .diff-btn {
+    cursor: pointer;
+    font-family: 'Special Elite', monospace;
+    background: transparent;
+    color: var(--chalk);
+    border: 2px dashed var(--chalk-dim);
+    border-radius: 8px;
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .diff-btn:hover { border-color: var(--chalk-yellow); color: var(--chalk-yellow); transform: translateY(-2px); }
+  .diff-btn.selected {
+    border-style: solid;
+    border-color: var(--chalk-yellow);
+    background: rgba(245,215,110,0.14);
+    color: var(--chalk-yellow);
+    box-shadow: inset 0 0 0 1px rgba(245,215,110,0.35);
+  }
+  .diff-name { font-family: 'Shadows Into Light', cursive; font-size: 22px; letter-spacing: 1px; }
+  .diff-blurb { font-family: 'Caveat', cursive; font-size: 16px; color: var(--chalk-dim); }
+  .diff-btn.selected .diff-blurb { color: var(--chalk); }
+  .diff-count { font-size: 11px; letter-spacing: 1px; opacity: 0.7; text-transform: uppercase; }
+
+  .category-chip.diff-easy { border-color: var(--chalk-green); color: var(--chalk-green); }
+  .category-chip.diff-medium { border-color: var(--chalk-yellow); color: var(--chalk-yellow); }
+  .category-chip.diff-hard { border-color: var(--chalk-red); color: var(--chalk-red); }
+
   @media (max-width: 420px) {
     .frame { padding: 10px; }
     .board { padding: 22px 16px 18px; }
     .option { font-size: 15px; }
+    .diff-group { grid-template-columns: 1fr; }
   }
 </style>
 </head>
