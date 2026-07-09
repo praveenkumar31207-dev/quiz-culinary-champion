@@ -311,9 +311,15 @@
   .diff-btn.selected .diff-blurb { color: var(--chalk); }
   .diff-count { font-size: 11px; letter-spacing: 1px; opacity: 0.7; text-transform: uppercase; }
 
-  .category-chip.diff-easy { border-color: var(--chalk-green); color: var(--chalk-green); }
-  .category-chip.diff-medium { border-color: var(--chalk-yellow); color: var(--chalk-yellow); }
-  .category-chip.diff-hard { border-color: var(--chalk-red); color: var(--chalk-red); }
+  .category-chip.diff-easy { background: transparent; border: 2px solid var(--chalk-green); color: var(--chalk-green); }
+  .category-chip.diff-medium { background: transparent; border: 2px solid var(--chalk-yellow); color: var(--chalk-yellow); }
+  .category-chip.diff-hard { background: transparent; border: 2px solid var(--chalk-red); color: var(--chalk-red); }
+  .diff-chip {
+    font-size: 14px;
+    padding: 2px 8px;
+    transform: rotate(2deg);
+    margin-left: 6px;
+  }
 
   @media (max-width: 420px) {
     .frame { padding: 10px; }
