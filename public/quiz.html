@@ -321,11 +321,89 @@
     margin-left: 6px;
   }
 
+  /* Category picker */
+  .cat-group {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+    max-width: 500px; margin: 0 auto 6px;
+  }
+  .cat-chip {
+    cursor: pointer;
+    font-family: 'Special Elite', monospace;
+    font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
+    background: transparent; color: var(--chalk-dim);
+    border: 2px dashed var(--chalk-dim);
+    border-radius: 20px; padding: 6px 14px;
+    transition: all 0.15s ease;
+  }
+  .cat-chip:hover { color: var(--chalk); border-color: var(--chalk); }
+  .cat-chip.selected {
+    border-style: solid; color: var(--board);
+    background: var(--chalk-yellow); border-color: var(--chalk-yellow);
+  }
+
+  /* Level grid */
+  .level-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    max-width: 520px;
+    margin: 4px auto 10px;
+  }
+  .level-btn {
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 18px;
+    background: transparent;
+    color: var(--chalk);
+    border: 2px dashed rgba(245,241,230,0.35);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: all 0.15s ease;
+  }
+  .level-btn:hover:not(:disabled) {
+    border-color: var(--chalk-yellow); color: var(--chalk-yellow);
+    transform: translateY(-1px);
+  }
+  .level-btn.cleared {
+    border-style: solid;
+    border-color: var(--chalk-green);
+    color: var(--chalk-green);
+    background: rgba(126,217,87,0.10);
+  }
+  .level-btn.current {
+    border-style: solid;
+    border-color: var(--chalk-yellow);
+    color: var(--chalk-yellow);
+    background: rgba(245,215,110,0.16);
+    box-shadow: 0 0 0 2px rgba(245,215,110,0.25);
+  }
+  .level-btn:disabled {
+    opacity: 0.35; cursor: not-allowed;
+    color: var(--chalk-dim); border-color: rgba(245,241,230,0.15);
+  }
+  .level-hint {
+    text-align: center; font-family: 'Caveat', cursive;
+    color: var(--chalk-dim); font-size: 17px; margin: 2px 0 10px;
+  }
+  .level-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    max-width: 520px; margin: 0 auto 4px;
+    font-family: 'Caveat', cursive; color: var(--chalk-dim); font-size: 18px;
+  }
+  .level-header strong { color: var(--chalk-yellow); font-family: 'Shadows Into Light', cursive; font-size: 22px; }
+
+  @media (max-width: 520px) {
+    .level-grid { grid-template-columns: repeat(6, 1fr); }
+  }
   @media (max-width: 420px) {
     .frame { padding: 10px; }
     .board { padding: 22px 16px 18px; }
     .option { font-size: 15px; }
     .diff-group { grid-template-columns: 1fr; }
+    .level-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+    .level-btn { font-size: 16px; }
   }
 </style>
 </head>
