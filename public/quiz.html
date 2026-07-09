@@ -270,10 +270,56 @@
     font-size: 18px;
   }
 
+  .diff-label {
+    text-align: center;
+    font-family: 'Caveat', cursive;
+    color: var(--chalk-dim);
+    font-size: 20px;
+    margin: 18px 0 8px;
+  }
+  .diff-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 0 auto 18px;
+    max-width: 460px;
+  }
+  .diff-btn {
+    cursor: pointer;
+    font-family: 'Special Elite', monospace;
+    background: transparent;
+    color: var(--chalk);
+    border: 2px dashed var(--chalk-dim);
+    border-radius: 8px;
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .diff-btn:hover { border-color: var(--chalk-yellow); color: var(--chalk-yellow); transform: translateY(-2px); }
+  .diff-btn.selected {
+    border-style: solid;
+    border-color: var(--chalk-yellow);
+    background: rgba(245,215,110,0.14);
+    color: var(--chalk-yellow);
+    box-shadow: inset 0 0 0 1px rgba(245,215,110,0.35);
+  }
+  .diff-name { font-family: 'Shadows Into Light', cursive; font-size: 22px; letter-spacing: 1px; }
+  .diff-blurb { font-family: 'Caveat', cursive; font-size: 16px; color: var(--chalk-dim); }
+  .diff-btn.selected .diff-blurb { color: var(--chalk); }
+  .diff-count { font-size: 11px; letter-spacing: 1px; opacity: 0.7; text-transform: uppercase; }
+
+  .category-chip.diff-easy { border-color: var(--chalk-green); color: var(--chalk-green); }
+  .category-chip.diff-medium { border-color: var(--chalk-yellow); color: var(--chalk-yellow); }
+  .category-chip.diff-hard { border-color: var(--chalk-red); color: var(--chalk-red); }
+
   @media (max-width: 420px) {
     .frame { padding: 10px; }
     .board { padding: 22px 16px 18px; }
     .option { font-size: 15px; }
+    .diff-group { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -289,7 +335,9 @@
   "use strict";
 
   const QUESTIONS = [
+    // ---------- EASY ----------
     {
+      difficulty: "easy",
       category: "World Cuisine",
       question: "Which country is the birthplace of sushi?",
       options: ["China", "Japan", "Korea", "Thailand"],
@@ -297,13 +345,7 @@
       fact: "Sushi originated as a preservation method in Southeast Asia, but modern nigiri sushi was perfected in 19th‑century Edo (Tokyo)."
     },
     {
-      category: "World Cuisine",
-      question: "Paella is a traditional rice dish from which region?",
-      options: ["Tuscany, Italy", "Valencia, Spain", "Provence, France", "Lisbon, Portugal"],
-      answer: 1,
-      fact: "Authentic Valencian paella traditionally uses rabbit, chicken and snails — no seafood!"
-    },
-    {
+      difficulty: "easy",
       category: "World Cuisine",
       question: "Which spice gives curry its signature yellow color?",
       options: ["Cumin", "Paprika", "Turmeric", "Saffron"],
@@ -311,6 +353,7 @@
       fact: "Turmeric contains curcumin, a compound studied for its anti‑inflammatory properties."
     },
     {
+      difficulty: "easy",
       category: "World Cuisine",
       question: "Kimchi is a staple fermented dish from which country?",
       options: ["Vietnam", "Japan", "Korea", "China"],
@@ -318,6 +361,23 @@
       fact: "There are over 180 recognized varieties of kimchi in Korea."
     },
     {
+      difficulty: "easy",
+      category: "World Cuisine",
+      question: "Which country is the birthplace of pizza?",
+      options: ["France", "Greece", "Italy", "Spain"],
+      answer: 2,
+      fact: "Modern pizza as we know it was born in Naples in the 18th–19th century."
+    },
+    {
+      difficulty: "easy",
+      category: "World Cuisine",
+      question: "What is the main ingredient in guacamole?",
+      options: ["Tomato", "Avocado", "Zucchini", "Cucumber"],
+      answer: 1,
+      fact: "The word 'guacamole' comes from the Nahuatl 'āhuacamolli' — literally 'avocado sauce'."
+    },
+    {
+      difficulty: "easy",
       category: "Nutrition",
       question: "Which vitamin is produced when your skin is exposed to sunlight?",
       options: ["Vitamin A", "Vitamin B12", "Vitamin C", "Vitamin D"],
@@ -325,20 +385,15 @@
       fact: "Just 10–20 minutes of midday sun can produce enough vitamin D for the day for many people."
     },
     {
+      difficulty: "easy",
       category: "Nutrition",
-      question: "Which of these foods is the richest source of potassium per serving?",
-      options: ["Banana", "Sweet potato", "Spinach", "Avocado"],
+      question: "Which fruit is famously loaded with vitamin C?",
+      options: ["Apple", "Orange", "Grape", "Pear"],
       answer: 1,
-      fact: "A medium sweet potato has roughly 540mg of potassium — more than a banana's ~420mg."
+      fact: "A medium orange delivers roughly 70mg of vitamin C — most of the daily recommended intake."
     },
     {
-      category: "Nutrition",
-      question: "How many calories are in 1 gram of fat?",
-      options: ["4", "7", "9", "12"],
-      answer: 2,
-      fact: "Fat packs 9 kcal/g, more than double carbs and protein (4 kcal/g each). Alcohol sits at 7 kcal/g."
-    },
-    {
+      difficulty: "easy",
       category: "Nutrition",
       question: "Which nutrient is the body's preferred source of quick energy?",
       options: ["Protein", "Carbohydrates", "Fat", "Fiber"],
@@ -346,20 +401,65 @@
       fact: "Carbs break down into glucose, the primary fuel for your brain and muscles during exercise."
     },
     {
-      category: "Food Science",
-      question: "The Maillard reaction is responsible for what?",
-      options: ["Fermentation of bread", "Browning of seared meat", "Curdling of milk", "Souring of yogurt"],
-      answer: 1,
-      fact: "The Maillard reaction happens between amino acids and reducing sugars above ~140°C — it's why seared steak and toast taste so good."
-    },
-    {
+      difficulty: "easy",
       category: "Food Science",
       question: "What causes bread dough to rise?",
       options: ["Baking soda", "Yeast producing CO₂", "Salt reacting with flour", "Water evaporating"],
       answer: 1,
       fact: "Yeast eats sugars and releases carbon dioxide and ethanol — the CO₂ inflates the gluten network."
     },
+
+    // ---------- MEDIUM ----------
     {
+      difficulty: "medium",
+      category: "World Cuisine",
+      question: "Paella is a traditional rice dish from which region?",
+      options: ["Tuscany, Italy", "Valencia, Spain", "Provence, France", "Lisbon, Portugal"],
+      answer: 1,
+      fact: "Authentic Valencian paella traditionally uses rabbit, chicken and snails — no seafood!"
+    },
+    {
+      difficulty: "medium",
+      category: "World Cuisine",
+      question: "Which cheese is traditionally used in tiramisu?",
+      options: ["Ricotta", "Mozzarella", "Mascarpone", "Feta"],
+      answer: 2,
+      fact: "Mascarpone is a rich Italian cream cheese with 60–75% fat — the source of tiramisu's silky texture."
+    },
+    {
+      difficulty: "medium",
+      category: "World Cuisine",
+      question: "Which country produces the most coffee in the world?",
+      options: ["Colombia", "Vietnam", "Ethiopia", "Brazil"],
+      answer: 3,
+      fact: "Brazil has been the world's largest coffee producer for over 150 years."
+    },
+    {
+      difficulty: "medium",
+      category: "Nutrition",
+      question: "Which of these foods is the richest source of potassium per serving?",
+      options: ["Banana", "Sweet potato", "Spinach", "Avocado"],
+      answer: 1,
+      fact: "A medium sweet potato has roughly 540mg of potassium — more than a banana's ~420mg."
+    },
+    {
+      difficulty: "medium",
+      category: "Nutrition",
+      question: "How many calories are in 1 gram of fat?",
+      options: ["4", "7", "9", "12"],
+      answer: 2,
+      fact: "Fat packs 9 kcal/g, more than double carbs and protein (4 kcal/g each). Alcohol sits at 7 kcal/g."
+    },
+    {
+      difficulty: "medium",
+      category: "Food Science",
+      question: "What is the process of converting sugar into alcohol called?",
+      options: ["Oxidation", "Fermentation", "Emulsification", "Pasteurization"],
+      answer: 1,
+      fact: "Fermentation by yeast is the basis of beer, wine, sake, and even sourdough bread."
+    },
+    {
+      difficulty: "medium",
       category: "Food Science",
       question: "Why do onions make you cry?",
       options: [
@@ -371,14 +471,51 @@
       answer: 1,
       fact: "Cutting onions releases syn‑propanethial‑S‑oxide, which reacts with the water in your eyes to form a mild sulfuric acid."
     },
+
+    // ---------- HARD ----------
     {
+      difficulty: "hard",
       category: "Food Science",
-      question: "What is the process of converting sugar into alcohol called?",
-      options: ["Oxidation", "Fermentation", "Emulsification", "Pasteurization"],
+      question: "The Maillard reaction is responsible for what?",
+      options: ["Fermentation of bread", "Browning of seared meat", "Curdling of milk", "Souring of yogurt"],
       answer: 1,
-      fact: "Fermentation by yeast is the basis of beer, wine, sake, and even sourdough bread."
+      fact: "The Maillard reaction happens between amino acids and reducing sugars above ~140°C — it's why seared steak and toast taste so good."
+    },
+    {
+      difficulty: "hard",
+      category: "Food Science",
+      question: "Which enzyme in fresh pineapple breaks down protein (and prevents jello from setting)?",
+      options: ["Amylase", "Bromelain", "Lipase", "Pepsin"],
+      answer: 1,
+      fact: "Bromelain digests proteins so aggressively that fresh pineapple will tenderize meat — and dissolve gelatin."
+    },
+    {
+      difficulty: "hard",
+      category: "Food Science",
+      question: "The umami taste is triggered primarily by which compound?",
+      options: ["Citric acid", "Fructose", "Glutamate", "Capsaicin"],
+      answer: 2,
+      fact: "Glutamate — abundant in aged cheese, tomatoes, mushrooms and soy sauce — was identified as the 5th basic taste in 1908."
+    },
+    {
+      difficulty: "hard",
+      category: "Food Science",
+      question: "Which acid gives yogurt its characteristic tang?",
+      options: ["Acetic acid", "Citric acid", "Malic acid", "Lactic acid"],
+      answer: 3,
+      fact: "Lactic acid bacteria ferment lactose into lactic acid, dropping the pH and coagulating the milk proteins."
+    },
+    {
+      difficulty: "hard",
+      category: "Nutrition",
+      question: "Which essential amino acid is notably low in most plant proteins (except soy and quinoa)?",
+      options: ["Lysine", "Glutamine", "Alanine", "Tyrosine"],
+      answer: 0,
+      fact: "That's why grain‑and‑legume combos (rice + beans, hummus + pita) have been dietary staples for millennia."
     }
   ];
+
+  const QUIZ_LENGTH = 8; // questions per round (per difficulty)
 
   // ---- State (kept in JS, NOT the DOM) ----
   let questions = [];
@@ -386,6 +523,13 @@
   let score = 0;
   let answered = false;
   let results = []; // {correct: bool}
+  let difficulty = "medium";
+
+  const DIFFICULTIES = [
+    { key: "easy",   label: "Easy",   blurb: "Warm‑up bites" },
+    { key: "medium", label: "Medium", blurb: "Chef's choice" },
+    { key: "hard",   label: "Hard",   blurb: "Tasting menu" }
+  ];
 
   const board = document.getElementById("board");
 
@@ -421,8 +565,37 @@
     const hr = el("hr", { class: "rule" });
     const desc = el("p", {
       class: "description",
-      text: "Test your palate of knowledge across world cuisines, nutrition and food science. 12 questions. No pressure — just flavor."
+      text: "Test your palate across world cuisines, nutrition and food science. Pick your difficulty — questions and answers are shuffled every round."
     });
+
+    // Difficulty picker
+    const diffLabel = el("p", { class: "diff-label", text: "Choose your difficulty" });
+    const diffWrap = el("div", { class: "diff-group", attrs: { role: "radiogroup", "aria-label": "Difficulty" } });
+    const diffButtons = [];
+    DIFFICULTIES.forEach(d => {
+      const count = QUESTIONS.filter(q => q.difficulty === d.key).length;
+      const btn = el("button", {
+        class: "diff-btn" + (d.key === difficulty ? " selected" : ""),
+        attrs: { type: "button", "data-diff": d.key, "aria-pressed": d.key === difficulty ? "true" : "false" },
+        on: {
+          click: () => {
+            difficulty = d.key;
+            diffButtons.forEach(b => {
+              const sel = b.getAttribute("data-diff") === difficulty;
+              b.classList.toggle("selected", sel);
+              b.setAttribute("aria-pressed", sel ? "true" : "false");
+            });
+          }
+        }
+      }, [
+        el("span", { class: "diff-name", text: d.label }),
+        el("span", { class: "diff-blurb", text: d.blurb }),
+        el("span", { class: "diff-count", text: count + " Qs" })
+      ]);
+      diffButtons.push(btn);
+      diffWrap.appendChild(btn);
+    });
+
     const btnWrap = el("div", { class: "center" });
     const startBtn = el("button", {
       class: "btn",
@@ -436,12 +609,14 @@
       text: "Chef's tip: read every option before choosing."
     });
 
-    board.append(title, sub, hr, desc, btnWrap, note);
+    board.append(title, sub, hr, desc, diffLabel, diffWrap, btnWrap, note);
   }
 
   function startGame() {
-    // Shuffle questions and each question's options while preserving correct answer
-    questions = shuffle(QUESTIONS).map(q => {
+    // Filter by difficulty, shuffle, then cap length
+    const pool = QUESTIONS.filter(q => q.difficulty === difficulty);
+    const chosen = shuffle(pool).slice(0, Math.min(QUIZ_LENGTH, pool.length));
+    questions = chosen.map(q => {
       const indices = shuffle(q.options.map((_, i) => i));
       return {
         ...q,
@@ -463,7 +638,7 @@
 
     // Meta row: category + score
     const meta = el("div", { class: "meta-row" });
-    const cat = el("span", { class: "category-chip", text: q.category });
+    const cat = el("span", { class: "category-chip diff-" + (q.difficulty || difficulty), text: q.category + " · " + (q.difficulty || difficulty).toUpperCase() });
     const scoreLine = el("span", { class: "score-line", text: `Score: ${score}` });
     meta.append(cat, scoreLine);
 
