@@ -1308,9 +1308,11 @@
       on: { click: renderStart }
     }));
 
-    const noteText = isLastLevel && passed
-      ? "You cleared every level on " + difficulty + " — chef's hat earned! 🎩"
-      : (newlyUnlocked ? ("Level " + (currentLevel + 1) + " unlocked!") : "Score 60% or higher to unlock the next level.");
+    const noteText = timedOut
+      ? "You had " + TIMER_SECONDS + " seconds per question — the timer beat you this time."
+      : (isLastLevel && passed
+        ? "You cleared every level on " + difficulty + " — chef's hat earned! 🎩"
+        : (newlyUnlocked ? ("Level " + (currentLevel + 1) + " unlocked!") : "Score 60% or higher to unlock the next level."));
     const note = el("p", { class: "footer-note", text: noteText });
 
     board.append(title, big, v, stats, review, actions, note);
