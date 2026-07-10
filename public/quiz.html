@@ -912,6 +912,7 @@
   }
 
   function clearBoard() {
+    stopTimer && stopTimer();
     while (board.firstChild) board.removeChild(board.firstChild);
   }
 
