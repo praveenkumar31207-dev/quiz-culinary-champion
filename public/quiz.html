@@ -1124,7 +1124,48 @@
     });
     actions.appendChild(nextBtn);
 
-    board.append(meta, progressText, dots, questionEl, optionsWrap, actions);
+    board.append(meta, progressText, timerWrap, dots, questionEl, optionsWrap, actions);
+    startTimer();
+  }
+
+  function startTimer() {
+    stopTimer();
+    timeLeft = TIMER_SECONDS;
+    updateTimerUI();
+    timerId = setInterval(() => {
+      timeLeft -= 1;
+      updateTimerUI();
+      if (timeLeft <= 0) {
+        stopTimer();
+        handleTimeout();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerId != null) { clearInterval(timerId); timerId = null; }
+  }
+
+  function updateTimerUI() {
+    const fill = document.getElementById("timer-fill");
+    const clock = document.getElementById("timer-clock");
+    if (!fill || !clock) return;
+    const pct = Math.max(0, timeLeft) / TIMER_SECONDS;
+    fill.style.transform = "scaleX(" + pct + ")";
+    fill.classList.toggle("warn", timeLeft <= 10 && timeLeft > 5);
+    fill.classList.toggle("danger", timeLeft <= 5);
+    clock.classList.toggle("danger", timeLeft <= 5);
+    clock.textContent = Math.max(0, timeLeft) + "s";
+  }
+
+  function handleTimeout() {
+    if (answered) return;
+    answered = true;
+    // Mark the current question as wrong (no selection)
+    const q = questions[currentIndex];
+    results.push({ correct: false, selectedIdx: null, question: q });
+    // End the round immediately — time ran out
+    renderResults(true);
   }
 
   function handleAnswer(selectedIdx, buttons, q) {
