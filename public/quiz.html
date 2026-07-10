@@ -270,6 +270,39 @@
     font-size: 18px;
   }
 
+  /* Timer */
+  .timer-wrap {
+    margin: 4px 0 10px;
+  }
+  .timer-bar {
+    position: relative;
+    height: 10px;
+    background: rgba(245,241,230,0.12);
+    border: 1px solid rgba(245,241,230,0.25);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .timer-fill {
+    position: absolute; inset: 0 auto 0 0;
+    width: 100%;
+    background: linear-gradient(90deg, var(--chalk-green), var(--chalk-yellow));
+    transform-origin: left center;
+    transition: transform 0.25s linear, background 0.3s ease;
+  }
+  .timer-fill.warn { background: linear-gradient(90deg, var(--chalk-yellow), #ffb347); }
+  .timer-fill.danger { background: linear-gradient(90deg, #ff8a5c, var(--chalk-red)); animation: pulse 0.7s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .timer-text {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: 'Caveat', cursive; color: var(--chalk-dim);
+    font-size: 16px; margin-top: 2px;
+  }
+  .timer-text .clock {
+    font-family: 'Shadows Into Light', cursive;
+    color: var(--chalk-yellow); font-size: 20px;
+  }
+  .timer-text .clock.danger { color: var(--chalk-red); }
+
   .review {
     margin: 18px 0 22px;
     display: grid;
