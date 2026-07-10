@@ -270,6 +270,45 @@
     font-size: 18px;
   }
 
+  .review {
+    margin: 18px 0 22px;
+    display: grid;
+    gap: 12px;
+  }
+  .review-title {
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 24px;
+    color: var(--chalk-yellow);
+    text-align: center;
+    margin: 4px 0 2px;
+  }
+  .review-card {
+    background: rgba(245,241,230,0.06);
+    border: 2px dashed rgba(245,241,230,0.25);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .review-card.correct { border-color: var(--chalk-green); background: rgba(126,217,87,0.08); }
+  .review-card.wrong { border-color: var(--chalk-red); background: rgba(255,107,107,0.08); }
+  .review-q {
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    line-height: 1.3;
+    margin: 0 0 8px;
+    color: var(--chalk);
+  }
+  .review-row {
+    font-family: 'Special Elite', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 2px 0;
+  }
+  .review-row .label { color: var(--chalk-dim); margin-right: 6px; }
+  .review-row .value { color: var(--chalk); }
+  .review-row .selected { color: var(--chalk-red); }
+  .review-row.correct-answer .value { color: var(--chalk-green); }
+
+
   .diff-label {
     text-align: center;
     font-family: 'Caveat', cursive;
@@ -881,7 +920,7 @@
     answered = true;
     const isCorrect = selectedIdx === q.answer;
     if (isCorrect) score += 1;
-    results.push({ correct: isCorrect });
+    results.push({ correct: isCorrect, selectedIdx, question: q });
 
     buttons.forEach((btn, i) => {
       btn.disabled = true;
@@ -968,6 +1007,26 @@
       ])
     ]);
 
+    // Question-by-question review
+    const review = el("div", { class: "review" });
+    review.appendChild(el("h3", { class: "review-title", text: "Question Review" }));
+    questions.forEach((q, i) => {
+      const r = results[i];
+      const card = el("div", { class: "review-card" + (r.correct ? " correct" : " wrong") });
+      card.appendChild(el("div", { class: "review-q", text: (i + 1) + ". " + q.question }));
+      const selectedRow = el("div", { class: "review-row" }, [
+        el("span", { class: "label", text: "Your answer:" }),
+        el("span", { class: "value" + (r.correct ? "" : " selected"), text: (r.selectedIdx != null ? q.options[r.selectedIdx] : "—") })
+      ]);
+      const correctRow = el("div", { class: "review-row correct-answer" }, [
+        el("span", { class: "label", text: "Correct answer:" }),
+        el("span", { class: "value", text: q.options[q.answer] })
+      ]);
+      card.appendChild(selectedRow);
+      card.appendChild(correctRow);
+      review.appendChild(card);
+    });
+
     const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } });
     if (passed && !isLastLevel) {
       actions.appendChild(el("button", {
@@ -992,7 +1051,7 @@
       : (newlyUnlocked ? ("Level " + (currentLevel + 1) + " unlocked!") : "Score 60% or higher to unlock the next level.");
     const note = el("p", { class: "footer-note", text: noteText });
 
-    board.append(title, big, v, stats, actions, note);
+    board.append(title, big, v, stats, review, actions, note);
   }
 
   // Boot
