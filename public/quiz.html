@@ -1172,6 +1172,7 @@
   function handleAnswer(selectedIdx, buttons, q) {
     if (answered) return;
     answered = true;
+    stopTimer();
     const isCorrect = selectedIdx === q.answer;
     if (isCorrect) score += 1;
     results.push({ correct: isCorrect, selectedIdx, question: q });
