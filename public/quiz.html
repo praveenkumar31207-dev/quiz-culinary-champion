@@ -1235,13 +1235,14 @@
     }
 
     let verdict;
-    if (pct === 100) verdict = "Perfect plate! Michelin‑star mind. ⭐";
+    if (timedOut) verdict = "⏰ Time's up! The round ended — try again to clear this level.";
+    else if (pct === 100) verdict = "Perfect plate! Michelin‑star mind. ⭐";
     else if (pct >= 80) verdict = "Executive chef material — very well done!";
     else if (pct >= 60) verdict = "Solid sous‑chef performance.";
     else if (pct >= 40) verdict = "Still prepping — need 60% to clear.";
     else verdict = "Back to culinary school — need 60% to clear.";
 
-    const title = el("h2", { class: "results-title", text: passed ? ("Level " + currentLevel + " Cleared!") : ("Level " + currentLevel) });
+    const title = el("h2", { class: "results-title", text: timedOut ? ("Time's Up — Level " + currentLevel) : (passed ? ("Level " + currentLevel + " Cleared!") : ("Level " + currentLevel)) });
     const big = el("div", { class: "big-score" });
     big.append(document.createTextNode(pct + "%"));
     big.appendChild(el("small", { text: ` (${correct}/${total})` }));
