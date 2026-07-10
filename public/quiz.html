@@ -270,6 +270,39 @@
     font-size: 18px;
   }
 
+  /* Timer */
+  .timer-wrap {
+    margin: 4px 0 10px;
+  }
+  .timer-bar {
+    position: relative;
+    height: 10px;
+    background: rgba(245,241,230,0.12);
+    border: 1px solid rgba(245,241,230,0.25);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .timer-fill {
+    position: absolute; inset: 0 auto 0 0;
+    width: 100%;
+    background: linear-gradient(90deg, var(--chalk-green), var(--chalk-yellow));
+    transform-origin: left center;
+    transition: transform 0.25s linear, background 0.3s ease;
+  }
+  .timer-fill.warn { background: linear-gradient(90deg, var(--chalk-yellow), #ffb347); }
+  .timer-fill.danger { background: linear-gradient(90deg, #ff8a5c, var(--chalk-red)); animation: pulse 0.7s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .timer-text {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: 'Caveat', cursive; color: var(--chalk-dim);
+    font-size: 16px; margin-top: 2px;
+  }
+  .timer-text .clock {
+    font-family: 'Shadows Into Light', cursive;
+    color: var(--chalk-yellow); font-size: 20px;
+  }
+  .timer-text .clock.danger { color: var(--chalk-red); }
+
   .review {
     margin: 18px 0 22px;
     display: grid;
@@ -635,12 +668,174 @@
       options: ["Lysine", "Glutamine", "Alanine", "Tyrosine"],
       answer: 0,
       fact: "That's why grain‑and‑legume combos (rice + beans, hummus + pita) have been dietary staples for millennia."
+    },
+
+    // ---------- BAKING & DESSERTS ----------
+    {
+      difficulty: "easy",
+      category: "Baking & Desserts",
+      question: "Which ingredient makes cookies spread more when baked?",
+      options: ["More flour", "More butter", "More eggs", "More baking powder"],
+      answer: 1,
+      fact: "Butter melts early in the oven, thinning the dough and letting it spread before the structure sets."
+    },
+    {
+      difficulty: "medium",
+      category: "Baking & Desserts",
+      question: "What is the French pastry 'mille‑feuille' also known as in English?",
+      options: ["Cream horn", "Napoleon", "Éclair", "Palmier"],
+      answer: 1,
+      fact: "'Mille‑feuille' literally means 'a thousand leaves' — the pastry has 729 flaky layers when done classically."
+    },
+    {
+      difficulty: "hard",
+      category: "Baking & Desserts",
+      question: "In baking, what does 'blooming' cocoa powder mean?",
+      options: [
+        "Sifting it twice",
+        "Whisking it with egg whites",
+        "Dissolving it in hot liquid or fat to intensify flavor",
+        "Toasting it in a dry pan"
+      ],
+      answer: 2,
+      fact: "Blooming disperses cocoa solids and releases fat‑soluble aromatic compounds — deeper, richer chocolate flavor."
+    },
+
+    // ---------- BEVERAGES ----------
+    {
+      difficulty: "easy",
+      category: "Beverages",
+      question: "Which grain is the main ingredient in traditional beer?",
+      options: ["Rice", "Barley", "Corn", "Rye"],
+      answer: 1,
+      fact: "Malted barley provides the sugars yeast ferments into alcohol — and the characteristic beer flavor."
+    },
+    {
+      difficulty: "medium",
+      category: "Beverages",
+      question: "Which tea is fully oxidized during processing?",
+      options: ["Green tea", "White tea", "Oolong", "Black tea"],
+      answer: 3,
+      fact: "Black tea leaves are fully oxidized, turning them dark and giving the bold, malty brew."
+    },
+    {
+      difficulty: "hard",
+      category: "Beverages",
+      question: "What grape variety is champagne primarily made from?",
+      options: ["Chardonnay, Pinot Noir, Pinot Meunier", "Sauvignon Blanc only", "Riesling and Merlot", "Cabernet and Syrah"],
+      answer: 0,
+      fact: "True Champagne uses a blend of these three grapes grown in the Champagne region of France."
+    },
+
+    // ---------- FRUITS & VEGETABLES ----------
+    {
+      difficulty: "easy",
+      category: "Fruits & Vegetables",
+      question: "Botanically, a tomato is a…",
+      options: ["Vegetable", "Fruit", "Tuber", "Legume"],
+      answer: 1,
+      fact: "Tomatoes develop from a flower and contain seeds — botanically a berry, culinarily a vegetable."
+    },
+    {
+      difficulty: "medium",
+      category: "Fruits & Vegetables",
+      question: "Which vegetable belongs to the same family as broccoli, kale, and cabbage?",
+      options: ["Zucchini", "Cauliflower", "Eggplant", "Carrot"],
+      answer: 1,
+      fact: "All are cultivars of Brassica oleracea — a single species bred into wildly different vegetables."
+    },
+    {
+      difficulty: "hard",
+      category: "Fruits & Vegetables",
+      question: "Which compound makes chili peppers hot?",
+      options: ["Piperine", "Capsaicin", "Allicin", "Menthol"],
+      answer: 1,
+      fact: "Capsaicin binds to the TRPV1 heat receptor — your brain literally thinks your mouth is burning."
+    },
+
+    // ---------- SEAFOOD ----------
+    {
+      difficulty: "easy",
+      category: "Seafood",
+      question: "Which fish is traditionally used in classic sushi 'toro'?",
+      options: ["Salmon", "Tuna", "Mackerel", "Cod"],
+      answer: 1,
+      fact: "Toro is the fatty belly of bluefin tuna — prized for its buttery melt‑in‑your‑mouth texture."
+    },
+    {
+      difficulty: "medium",
+      category: "Seafood",
+      question: "Which of these is a bivalve mollusk?",
+      options: ["Shrimp", "Octopus", "Scallop", "Squid"],
+      answer: 2,
+      fact: "Scallops, along with clams, mussels and oysters, have two hinged shells — hence 'bi‑valve'."
+    },
+    {
+      difficulty: "hard",
+      category: "Seafood",
+      question: "Fugu, the famously dangerous Japanese delicacy, contains which toxin?",
+      options: ["Cyanide", "Tetrodotoxin", "Botulinum toxin", "Ricin"],
+      answer: 1,
+      fact: "Tetrodotoxin is roughly 1,200× more toxic than cyanide — fugu chefs train for years before getting licensed."
+    },
+
+    // ---------- STREET FOOD ----------
+    {
+      difficulty: "easy",
+      category: "Street Food",
+      question: "The taco al pastor originated from a fusion with which cuisine?",
+      options: ["Japanese", "Lebanese", "French", "Indian"],
+      answer: 1,
+      fact: "Lebanese immigrants brought shawarma to Mexico in the 20th century — the vertical spit became al pastor."
+    },
+    {
+      difficulty: "medium",
+      category: "Street Food",
+      question: "Banh mi, a popular Vietnamese street sandwich, is served on what type of bread?",
+      options: ["Sourdough loaf", "Baguette", "Ciabatta", "Focaccia"],
+      answer: 1,
+      fact: "The baguette is a legacy of French colonization — Vietnam made it airier with rice flour."
+    },
+    {
+      difficulty: "hard",
+      category: "Street Food",
+      question: "Which country claims the doner kebab as invented in its capital in the 1970s?",
+      options: ["Turkey", "Germany", "Greece", "Lebanon"],
+      answer: 1,
+      fact: "The modern sandwich‑style doner kebab was popularized by Turkish immigrants in West Berlin around 1972."
+    },
+
+    // ---------- HERBS & SPICES ----------
+    {
+      difficulty: "easy",
+      category: "Herbs & Spices",
+      question: "Basil is a key ingredient in which Italian sauce?",
+      options: ["Bolognese", "Carbonara", "Pesto", "Arrabbiata"],
+      answer: 2,
+      fact: "Classic Genovese pesto is basil, pine nuts, garlic, Parmigiano, Pecorino, and olive oil — pounded in a mortar."
+    },
+    {
+      difficulty: "medium",
+      category: "Herbs & Spices",
+      question: "Which spice is the world's most expensive by weight?",
+      options: ["Vanilla", "Cardamom", "Saffron", "Star anise"],
+      answer: 2,
+      fact: "It takes ~150,000 crocus flowers — hand‑picked — to produce a single kilogram of saffron threads."
+    },
+    {
+      difficulty: "hard",
+      category: "Herbs & Spices",
+      question: "The 'trinity' base of Cajun cooking is celery, bell pepper, and…",
+      options: ["Carrot", "Onion", "Garlic", "Tomato"],
+      answer: 1,
+      fact: "Cajun's 'holy trinity' swaps carrot for bell pepper compared to the French mirepoix (onion, carrot, celery)."
     }
   ];
 
 
   const QUIZ_LENGTH = 5;      // questions per level
   const TOTAL_LEVELS = 50;
+  const TIMER_SECONDS = 20;   // per question countdown
 
   // ---- State (in-memory only) ----
   let questions = [];
@@ -650,7 +845,13 @@
   let results = [];
   let difficulty = "medium";
   let currentLevel = 1;
-  const ALL_CATEGORIES = ["World Cuisine", "Nutrition", "Food Science"];
+  let timerId = null;
+  let timeLeft = TIMER_SECONDS;
+  const ALL_CATEGORIES = [
+    "World Cuisine", "Nutrition", "Food Science",
+    "Baking & Desserts", "Beverages", "Fruits & Vegetables",
+    "Seafood", "Street Food", "Herbs & Spices"
+  ];
   let selectedCategories = new Set(ALL_CATEGORIES);
   // Highest level unlocked per difficulty (session only)
   const unlocked = { easy: 1, medium: 1, hard: 1 };
@@ -711,6 +912,7 @@
   }
 
   function clearBoard() {
+    stopTimer();
     while (board.firstChild) board.removeChild(board.firstChild);
   }
 
@@ -885,6 +1087,17 @@
       text: `Question ${currentIndex + 1} of ${questions.length}`
     });
 
+    // Timer bar
+    const timerWrap = el("div", { class: "timer-wrap" });
+    const timerBar = el("div", { class: "timer-bar" });
+    const timerFill = el("div", { class: "timer-fill", attrs: { id: "timer-fill" } });
+    timerBar.appendChild(timerFill);
+    const timerText = el("div", { class: "timer-text" }, [
+      el("span", { text: "Time left" }),
+      el("span", { class: "clock", attrs: { id: "timer-clock" }, text: TIMER_SECONDS + "s" })
+    ]);
+    timerWrap.append(timerBar, timerText);
+
     const questionEl = el("div", { class: "question", text: q.question });
 
     const optionsWrap = el("div", { class: "options" });
@@ -912,12 +1125,54 @@
     });
     actions.appendChild(nextBtn);
 
-    board.append(meta, progressText, dots, questionEl, optionsWrap, actions);
+    board.append(meta, progressText, timerWrap, dots, questionEl, optionsWrap, actions);
+    startTimer();
+  }
+
+  function startTimer() {
+    stopTimer();
+    timeLeft = TIMER_SECONDS;
+    updateTimerUI();
+    timerId = setInterval(() => {
+      timeLeft -= 1;
+      updateTimerUI();
+      if (timeLeft <= 0) {
+        stopTimer();
+        handleTimeout();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerId != null) { clearInterval(timerId); timerId = null; }
+  }
+
+  function updateTimerUI() {
+    const fill = document.getElementById("timer-fill");
+    const clock = document.getElementById("timer-clock");
+    if (!fill || !clock) return;
+    const pct = Math.max(0, timeLeft) / TIMER_SECONDS;
+    fill.style.transform = "scaleX(" + pct + ")";
+    fill.classList.toggle("warn", timeLeft <= 10 && timeLeft > 5);
+    fill.classList.toggle("danger", timeLeft <= 5);
+    clock.classList.toggle("danger", timeLeft <= 5);
+    clock.textContent = Math.max(0, timeLeft) + "s";
+  }
+
+  function handleTimeout() {
+    if (answered) return;
+    answered = true;
+    // Mark the current question as wrong (no selection)
+    const q = questions[currentIndex];
+    results.push({ correct: false, selectedIdx: null, question: q });
+    // End the round immediately — time ran out
+    renderResults(true);
   }
 
   function handleAnswer(selectedIdx, buttons, q) {
     if (answered) return;
     answered = true;
+    stopTimer();
     const isCorrect = selectedIdx === q.answer;
     if (isCorrect) score += 1;
     results.push({ correct: isCorrect, selectedIdx, question: q });
@@ -962,13 +1217,14 @@
     }
   }
 
-  function renderResults() {
+  function renderResults(timedOut) {
     clearBoard();
     const total = questions.length;
     const correct = score;
-    const wrong = total - correct;
+    const wrong = results.length - correct;
+    const answeredCount = results.length;
     const pct = Math.round((correct / total) * 100);
-    const passed = pct >= 60; // 3/5 or better clears the level
+    const passed = !timedOut && pct >= 60; // time-out ends the round without pass
     const isLastLevel = currentLevel >= TOTAL_LEVELS;
 
     // Unlock next level on pass
@@ -979,13 +1235,14 @@
     }
 
     let verdict;
-    if (pct === 100) verdict = "Perfect plate! Michelin‑star mind. ⭐";
+    if (timedOut) verdict = "⏰ Time's up! The round ended — try again to clear this level.";
+    else if (pct === 100) verdict = "Perfect plate! Michelin‑star mind. ⭐";
     else if (pct >= 80) verdict = "Executive chef material — very well done!";
     else if (pct >= 60) verdict = "Solid sous‑chef performance.";
     else if (pct >= 40) verdict = "Still prepping — need 60% to clear.";
     else verdict = "Back to culinary school — need 60% to clear.";
 
-    const title = el("h2", { class: "results-title", text: passed ? ("Level " + currentLevel + " Cleared!") : ("Level " + currentLevel) });
+    const title = el("h2", { class: "results-title", text: timedOut ? ("Time's Up — Level " + currentLevel) : (passed ? ("Level " + currentLevel + " Cleared!") : ("Level " + currentLevel)) });
     const big = el("div", { class: "big-score" });
     big.append(document.createTextNode(pct + "%"));
     big.appendChild(el("small", { text: ` (${correct}/${total})` }));
@@ -1012,11 +1269,16 @@
     review.appendChild(el("h3", { class: "review-title", text: "Question Review" }));
     questions.forEach((q, i) => {
       const r = results[i];
-      const card = el("div", { class: "review-card" + (r.correct ? " correct" : " wrong") });
+      const notReached = !r;
+      const cls = notReached ? " wrong" : (r.correct ? " correct" : " wrong");
+      const card = el("div", { class: "review-card" + cls });
       card.appendChild(el("div", { class: "review-q", text: (i + 1) + ". " + q.question }));
+      const yourAnswerText = notReached
+        ? "— (time ran out)"
+        : (r.selectedIdx != null ? q.options[r.selectedIdx] : "— (no answer)");
       const selectedRow = el("div", { class: "review-row" }, [
         el("span", { class: "label", text: "Your answer:" }),
-        el("span", { class: "value" + (r.correct ? "" : " selected"), text: (r.selectedIdx != null ? q.options[r.selectedIdx] : "—") })
+        el("span", { class: "value" + (r && r.correct ? "" : " selected"), text: yourAnswerText })
       ]);
       const correctRow = el("div", { class: "review-row correct-answer" }, [
         el("span", { class: "label", text: "Correct answer:" }),
@@ -1046,9 +1308,11 @@
       on: { click: renderStart }
     }));
 
-    const noteText = isLastLevel && passed
-      ? "You cleared every level on " + difficulty + " — chef's hat earned! 🎩"
-      : (newlyUnlocked ? ("Level " + (currentLevel + 1) + " unlocked!") : "Score 60% or higher to unlock the next level.");
+    const noteText = timedOut
+      ? "You had " + TIMER_SECONDS + " seconds per question — the timer beat you this time."
+      : (isLastLevel && passed
+        ? "You cleared every level on " + difficulty + " — chef's hat earned! 🎩"
+        : (newlyUnlocked ? ("Level " + (currentLevel + 1) + " unlocked!") : "Score 60% or higher to unlock the next level."));
     const note = el("p", { class: "footer-note", text: noteText });
 
     board.append(title, big, v, stats, review, actions, note);
