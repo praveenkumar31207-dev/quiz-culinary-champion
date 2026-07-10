@@ -1217,13 +1217,14 @@
     }
   }
 
-  function renderResults() {
+  function renderResults(timedOut) {
     clearBoard();
     const total = questions.length;
     const correct = score;
-    const wrong = total - correct;
+    const wrong = results.length - correct;
+    const answeredCount = results.length;
     const pct = Math.round((correct / total) * 100);
-    const passed = pct >= 60; // 3/5 or better clears the level
+    const passed = !timedOut && pct >= 60; // time-out ends the round without pass
     const isLastLevel = currentLevel >= TOTAL_LEVELS;
 
     // Unlock next level on pass
