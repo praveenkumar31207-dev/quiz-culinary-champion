@@ -1086,6 +1086,17 @@
       text: `Question ${currentIndex + 1} of ${questions.length}`
     });
 
+    // Timer bar
+    const timerWrap = el("div", { class: "timer-wrap" });
+    const timerBar = el("div", { class: "timer-bar" });
+    const timerFill = el("div", { class: "timer-fill", attrs: { id: "timer-fill" } });
+    timerBar.appendChild(timerFill);
+    const timerText = el("div", { class: "timer-text" }, [
+      el("span", { text: "Time left" }),
+      el("span", { class: "clock", attrs: { id: "timer-clock" }, text: TIMER_SECONDS + "s" })
+    ]);
+    timerWrap.append(timerBar, timerText);
+
     const questionEl = el("div", { class: "question", text: q.question });
 
     const optionsWrap = el("div", { class: "options" });
