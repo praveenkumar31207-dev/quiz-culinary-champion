@@ -1269,11 +1269,16 @@
     review.appendChild(el("h3", { class: "review-title", text: "Question Review" }));
     questions.forEach((q, i) => {
       const r = results[i];
-      const card = el("div", { class: "review-card" + (r.correct ? " correct" : " wrong") });
+      const notReached = !r;
+      const cls = notReached ? " wrong" : (r.correct ? " correct" : " wrong");
+      const card = el("div", { class: "review-card" + cls });
       card.appendChild(el("div", { class: "review-q", text: (i + 1) + ". " + q.question }));
+      const yourAnswerText = notReached
+        ? "— (time ran out)"
+        : (r.selectedIdx != null ? q.options[r.selectedIdx] : "— (no answer)");
       const selectedRow = el("div", { class: "review-row" }, [
         el("span", { class: "label", text: "Your answer:" }),
-        el("span", { class: "value" + (r.correct ? "" : " selected"), text: (r.selectedIdx != null ? q.options[r.selectedIdx] : "—") })
+        el("span", { class: "value" + (r && r.correct ? "" : " selected"), text: yourAnswerText })
       ]);
       const correctRow = el("div", { class: "review-row correct-answer" }, [
         el("span", { class: "label", text: "Correct answer:" }),
