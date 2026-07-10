@@ -835,6 +835,7 @@
 
   const QUIZ_LENGTH = 5;      // questions per level
   const TOTAL_LEVELS = 50;
+  const TIMER_SECONDS = 20;   // per question countdown
 
   // ---- State (in-memory only) ----
   let questions = [];
@@ -844,7 +845,13 @@
   let results = [];
   let difficulty = "medium";
   let currentLevel = 1;
-  const ALL_CATEGORIES = ["World Cuisine", "Nutrition", "Food Science"];
+  let timerId = null;
+  let timeLeft = TIMER_SECONDS;
+  const ALL_CATEGORIES = [
+    "World Cuisine", "Nutrition", "Food Science",
+    "Baking & Desserts", "Beverages", "Fruits & Vegetables",
+    "Seafood", "Street Food", "Herbs & Spices"
+  ];
   let selectedCategories = new Set(ALL_CATEGORIES);
   // Highest level unlocked per difficulty (session only)
   const unlocked = { easy: 1, medium: 1, hard: 1 };
