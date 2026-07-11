@@ -9,26 +9,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Shadows+Into+Light&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
   :root {
-    --chalk: #f5f1e6;
-    --chalk-dim: #d9d2bd;
-    --chalk-yellow: #f5d76e;
-    --chalk-green: #7ed957;
-    --chalk-red: #ff6b6b;
-    --board: #1f3a2e;
-    --board-dark: #142720;
-    --frame: #6b3f1d;
-    --frame-dark: #3d240f;
+    --ink: #f7ecd0;
+    --ink-dim: #cdb98a;
+    --ink-muted: #8f7f5c;
+    --gold: #e8c56b;
+    --gold-bright: #ffd97a;
+    --gold-deep: #a3792a;
+    --wine: #4a1220;
+    --wine-dark: #2a0812;
+    --plum: #1a0710;
+    --leaf: #7ed957;
+    --ember: #ff7a59;
+    --crimson: #ff5468;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; min-height: 100%; }
   body {
     font-family: 'Special Elite', 'Courier New', monospace;
     background:
-      linear-gradient(rgba(10,5,2,0.72), rgba(10,5,2,0.85)),
-      url('/quiz-bg.jpg') center center / cover no-repeat fixed,
-      radial-gradient(ellipse at center, #2a1a0e 0%, #140a04 100%);
-    color: var(--chalk);
-    padding: 16px;
+      radial-gradient(ellipse at 15% 10%, rgba(232,197,107,0.10), transparent 55%),
+      radial-gradient(ellipse at 85% 90%, rgba(255,122,89,0.10), transparent 55%),
+      linear-gradient(160deg, #1e0710 0%, #340b1c 45%, #14060c 100%);
+    color: var(--ink);
+    padding: 20px 14px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -36,84 +39,114 @@
   }
   .frame {
     width: 100%;
-    max-width: 640px;
-    padding: 16px;
-    border-radius: 14px;
+    max-width: 680px;
+    padding: 3px;
+    border-radius: 22px;
     background:
-      repeating-linear-gradient(45deg, var(--frame) 0 8px, var(--frame-dark) 8px 16px);
+      linear-gradient(135deg, #6a4a15 0%, var(--gold) 25%, #f7e29a 50%, var(--gold) 75%, #6a4a15 100%);
     box-shadow:
-      0 20px 50px rgba(0,0,0,0.6),
-      inset 0 0 0 3px #2a180a;
+      0 30px 80px -20px rgba(0,0,0,0.75),
+      0 0 60px -20px rgba(232,197,107,0.35);
   }
   .board {
     position: relative;
     background:
-      radial-gradient(ellipse at 20% 10%, rgba(255,255,255,0.05), transparent 60%),
-      radial-gradient(ellipse at 80% 90%, rgba(255,255,255,0.04), transparent 60%),
-      linear-gradient(180deg, var(--board) 0%, var(--board-dark) 100%);
-    border-radius: 8px;
-    padding: 28px 22px 22px;
-    min-height: 520px;
-    box-shadow: inset 0 0 60px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.05);
+      radial-gradient(ellipse at 20% 0%, rgba(232,197,107,0.10), transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,122,89,0.08), transparent 55%),
+      linear-gradient(180deg, #2a0a18 0%, var(--wine-dark) 55%, #1a0510 100%);
+    border-radius: 20px;
+    padding: 34px 26px 26px;
+    min-height: 540px;
+    box-shadow:
+      inset 0 0 80px rgba(0,0,0,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.06);
     overflow: hidden;
   }
   .board::before {
-    /* chalk dust */
+    content: "";
+    position: absolute; inset: 12px;
+    border: 1px solid rgba(232,197,107,0.22);
+    border-radius: 14px;
+    pointer-events: none;
+  }
+  .board::after {
     content: "";
     position: absolute; inset: 0;
     background-image:
-      radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-      radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
-    background-size: 3px 3px, 7px 7px;
-    background-position: 0 0, 1px 2px;
-    mix-blend-mode: screen;
+      radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 6px 6px;
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.6;
+  }
+  .board > * { position: relative; z-index: 1; }
+
+  .brand {
+    text-align: center;
+    font-family: 'Caveat', cursive;
+    color: var(--gold);
+    letter-spacing: 6px;
+    font-size: 14px;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+    opacity: 0.85;
   }
   .title {
     font-family: 'Shadows Into Light', cursive;
-    font-size: clamp(36px, 8vw, 54px);
-    color: var(--chalk-yellow);
+    font-size: clamp(40px, 9vw, 62px);
+    background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 55%, var(--gold-deep) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
     text-align: center;
     margin: 0 0 4px;
     letter-spacing: 1px;
-    text-shadow: 0 0 1px rgba(255,255,255,0.4);
+    filter: drop-shadow(0 2px 0 rgba(0,0,0,0.35));
   }
   .subtitle {
     font-family: 'Caveat', cursive;
     text-align: center;
-    color: var(--chalk-dim);
+    color: var(--ink-dim);
     font-size: 22px;
-    margin: 0 0 22px;
+    margin: 0 0 18px;
   }
   .rule {
     border: none;
-    border-top: 2px dashed rgba(245,241,230,0.25);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232,197,107,0.55), transparent);
     margin: 14px 0 18px;
   }
   .description {
-    font-size: 15px;
-    line-height: 1.55;
-    color: var(--chalk);
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--ink);
     text-align: center;
     margin: 0 auto 22px;
-    max-width: 460px;
+    max-width: 480px;
   }
   .btn {
     font-family: 'Shadows Into Light', cursive;
-    background: transparent;
-    color: var(--chalk-yellow);
-    border: 2px solid var(--chalk-yellow);
-    padding: 12px 26px;
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold) 55%, var(--gold-deep));
+    color: #2a0812;
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 12px 28px;
     font-size: 24px;
-    border-radius: 6px;
+    border-radius: 999px;
     cursor: pointer;
     letter-spacing: 1px;
-    transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease;
+    box-shadow: 0 8px 20px -8px rgba(232,197,107,0.55), inset 0 1px 0 rgba(255,255,255,0.5);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
   }
-  .btn:hover { background: var(--chalk-yellow); color: #2a1a0e; transform: translateY(-2px); }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -10px rgba(232,197,107,0.7), inset 0 1px 0 rgba(255,255,255,0.6); filter: brightness(1.05); }
   .btn:active { transform: translateY(0); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.4); }
+  .btn.ghost {
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid rgba(232,197,107,0.55);
+    box-shadow: none;
+  }
+  .btn.ghost:hover { background: rgba(232,197,107,0.10); }
   .center { text-align: center; }
 
   .meta-row {
@@ -122,18 +155,21 @@
     align-items: center;
     font-family: 'Caveat', cursive;
     font-size: 20px;
-    color: var(--chalk-dim);
+    color: var(--ink-dim);
     margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 6px;
   }
   .category-chip {
     display: inline-block;
     font-family: 'Shadows Into Light', cursive;
     font-size: 18px;
-    color: var(--board);
-    background: var(--chalk-yellow);
-    padding: 2px 12px;
-    border-radius: 20px;
+    color: var(--wine-dark);
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+    padding: 3px 14px;
+    border-radius: 999px;
     transform: rotate(-2deg);
+    box-shadow: 0 3px 10px -4px rgba(0,0,0,0.6);
   }
   .progress-dots {
     display: flex; gap: 6px; flex-wrap: wrap;
@@ -142,62 +178,62 @@
   }
   .dot {
     width: 12px; height: 12px; border-radius: 50%;
-    border: 2px solid var(--chalk-dim);
+    border: 2px solid var(--ink-muted);
     background: transparent;
   }
-  .dot.done { background: var(--chalk-yellow); border-color: var(--chalk-yellow); }
-  .dot.correct { background: var(--chalk-green); border-color: var(--chalk-green); }
-  .dot.wrong { background: var(--chalk-red); border-color: var(--chalk-red); }
-  .dot.current { box-shadow: 0 0 0 3px rgba(245,215,110,0.3); }
+  .dot.done { background: var(--gold); border-color: var(--gold); }
+  .dot.correct { background: var(--leaf); border-color: var(--leaf); }
+  .dot.wrong { background: var(--crimson); border-color: var(--crimson); }
+  .dot.current { box-shadow: 0 0 0 3px rgba(232,197,107,0.35); }
 
   .question {
     font-family: 'Caveat', cursive;
-    font-size: clamp(26px, 5.5vw, 34px);
+    font-size: clamp(26px, 5.5vw, 36px);
     line-height: 1.25;
-    color: var(--chalk);
+    color: var(--ink);
     margin: 6px 0 18px;
     text-align: center;
   }
-  .options {
-    display: grid; gap: 10px;
-  }
+  .options { display: grid; gap: 10px; }
   .option {
     font-family: 'Special Elite', monospace;
     font-size: 16px;
     text-align: left;
-    background: transparent;
-    color: var(--chalk);
-    border: 2px dashed rgba(245,241,230,0.4);
-    border-radius: 8px;
-    padding: 12px 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    color: var(--ink);
+    border: 1px solid rgba(232,197,107,0.28);
+    border-radius: 12px;
+    padding: 13px 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     transition: background 0.15s, border-color 0.15s, transform 0.1s;
   }
-  .option:hover:not(:disabled) { border-color: var(--chalk-yellow); background: rgba(245,215,110,0.08); }
+  .option:hover:not(:disabled) { border-color: var(--gold); background: rgba(232,197,107,0.10); transform: translateX(2px); }
   .option:disabled { cursor: default; }
   .option .letter {
     display: inline-flex;
-    width: 26px; height: 26px;
+    width: 28px; height: 28px;
     border-radius: 50%;
-    background: rgba(245,241,230,0.15);
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold-deep));
+    color: var(--wine-dark);
     align-items: center; justify-content: center;
     font-family: 'Shadows Into Light', cursive;
     font-size: 18px;
     flex-shrink: 0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
   }
   .option.correct {
-    border-color: var(--chalk-green);
+    border-color: var(--leaf);
     background: rgba(126,217,87,0.18);
-    color: #d5ffb8;
+    color: #e2ffcd;
     animation: pop 0.35s ease;
   }
   .option.wrong {
-    border-color: var(--chalk-red);
-    background: rgba(255,107,107,0.16);
-    color: #ffd4d4;
+    border-color: var(--crimson);
+    background: rgba(255,84,104,0.18);
+    color: #ffd4d9;
     animation: shake 0.35s ease;
   }
   @keyframes pop { 0%{transform:scale(1);} 40%{transform:scale(1.03);} 100%{transform:scale(1);} }
@@ -206,28 +242,29 @@
   .fun-fact {
     margin-top: 16px;
     padding: 12px 14px;
-    background: rgba(245,241,230,0.08);
-    border-left: 4px solid var(--chalk-yellow);
-    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(232,197,107,0.10), rgba(232,197,107,0.04));
+    border-left: 4px solid var(--gold);
+    border-radius: 8px;
     font-family: 'Caveat', cursive;
     font-size: 20px;
     line-height: 1.35;
-    color: var(--chalk);
+    color: var(--ink);
   }
-  .fun-fact strong { color: var(--chalk-yellow); font-family: 'Shadows Into Light', cursive; font-size: 22px; }
+  .fun-fact strong { color: var(--gold-bright); font-family: 'Shadows Into Light', cursive; font-size: 22px; }
 
   .actions { margin-top: 18px; text-align: center; }
 
   .score-line {
     font-family: 'Shadows Into Light', cursive;
     font-size: 22px;
-    color: var(--chalk-yellow);
+    color: var(--gold);
   }
 
   .results-title {
     font-family: 'Shadows Into Light', cursive;
     font-size: 44px;
-    color: var(--chalk-yellow);
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold-deep));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
     text-align: center;
     margin: 6px 0 4px;
   }
@@ -235,17 +272,17 @@
     font-family: 'Shadows Into Light', cursive;
     font-size: 88px;
     text-align: center;
-    color: var(--chalk);
+    color: var(--ink);
     line-height: 1;
     margin: 8px 0;
-    text-shadow: 0 0 1px rgba(255,255,255,0.4);
+    text-shadow: 0 2px 0 rgba(0,0,0,0.4);
   }
-  .big-score small { font-size: 28px; color: var(--chalk-dim); }
+  .big-score small { font-size: 28px; color: var(--ink-dim); }
   .verdict {
     font-family: 'Caveat', cursive;
     font-size: 26px;
     text-align: center;
-    color: var(--chalk);
+    color: var(--ink);
     margin: 8px 0 16px;
   }
   .stat-row {
@@ -256,9 +293,9 @@
   }
   .stat { text-align: center; }
   .stat .num { display:block; font-family: 'Shadows Into Light', cursive; font-size: 34px; }
-  .stat.correct .num { color: var(--chalk-green); }
-  .stat.wrong .num { color: var(--chalk-red); }
-  .stat.total .num { color: var(--chalk-yellow); }
+  .stat.correct .num { color: var(--leaf); }
+  .stat.wrong .num { color: var(--crimson); }
+  .stat.total .num { color: var(--gold); }
 
   .hidden { display: none !important; }
 
@@ -266,86 +303,81 @@
     text-align: center;
     margin-top: 14px;
     font-family: 'Caveat', cursive;
-    color: var(--chalk-dim);
+    color: var(--ink-dim);
     font-size: 18px;
   }
 
   /* Timer */
-  .timer-wrap {
-    margin: 4px 0 10px;
-  }
+  .timer-wrap { margin: 4px 0 10px; }
   .timer-bar {
     position: relative;
     height: 10px;
-    background: rgba(245,241,230,0.12);
-    border: 1px solid rgba(245,241,230,0.25);
-    border-radius: 6px;
+    background: rgba(232,197,107,0.10);
+    border: 1px solid rgba(232,197,107,0.28);
+    border-radius: 999px;
     overflow: hidden;
   }
   .timer-fill {
     position: absolute; inset: 0 auto 0 0;
     width: 100%;
-    background: linear-gradient(90deg, var(--chalk-green), var(--chalk-yellow));
+    background: linear-gradient(90deg, var(--leaf), var(--gold-bright));
     transform-origin: left center;
     transition: transform 0.25s linear, background 0.3s ease;
   }
-  .timer-fill.warn { background: linear-gradient(90deg, var(--chalk-yellow), #ffb347); }
-  .timer-fill.danger { background: linear-gradient(90deg, #ff8a5c, var(--chalk-red)); animation: pulse 0.7s ease-in-out infinite; }
+  .timer-fill.warn { background: linear-gradient(90deg, var(--gold-bright), var(--ember)); }
+  .timer-fill.danger { background: linear-gradient(90deg, var(--ember), var(--crimson)); animation: pulse 0.7s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
   .timer-text {
     display: flex; justify-content: space-between; align-items: baseline;
-    font-family: 'Caveat', cursive; color: var(--chalk-dim);
+    font-family: 'Caveat', cursive; color: var(--ink-dim);
     font-size: 16px; margin-top: 2px;
   }
   .timer-text .clock {
     font-family: 'Shadows Into Light', cursive;
-    color: var(--chalk-yellow); font-size: 20px;
+    color: var(--gold); font-size: 20px;
   }
-  .timer-text .clock.danger { color: var(--chalk-red); }
+  .timer-text .clock.danger { color: var(--crimson); }
 
-  .review {
-    margin: 18px 0 22px;
-    display: grid;
-    gap: 12px;
-  }
+  .review { margin: 18px 0 22px; display: grid; gap: 12px; }
   .review-title {
     font-family: 'Shadows Into Light', cursive;
     font-size: 24px;
-    color: var(--chalk-yellow);
+    color: var(--gold);
     text-align: center;
     margin: 4px 0 2px;
   }
   .review-card {
-    background: rgba(245,241,230,0.06);
-    border: 2px dashed rgba(245,241,230,0.25);
-    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(232,197,107,0.22);
+    border-radius: 10px;
     padding: 12px 14px;
   }
-  .review-card.correct { border-color: var(--chalk-green); background: rgba(126,217,87,0.08); }
-  .review-card.wrong { border-color: var(--chalk-red); background: rgba(255,107,107,0.08); }
-  .review-q {
-    font-family: 'Caveat', cursive;
-    font-size: 20px;
-    line-height: 1.3;
-    margin: 0 0 8px;
-    color: var(--chalk);
-  }
-  .review-row {
-    font-family: 'Special Elite', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    margin: 2px 0;
-  }
-  .review-row .label { color: var(--chalk-dim); margin-right: 6px; }
-  .review-row .value { color: var(--chalk); }
-  .review-row .selected { color: var(--chalk-red); }
-  .review-row.correct-answer .value { color: var(--chalk-green); }
+  .review-card.correct { border-color: var(--leaf); background: rgba(126,217,87,0.08); }
+  .review-card.wrong { border-color: var(--crimson); background: rgba(255,84,104,0.08); }
+  .review-q { font-family: 'Caveat', cursive; font-size: 20px; line-height: 1.3; margin: 0 0 8px; color: var(--ink); }
+  .review-row { font-family: 'Special Elite', monospace; font-size: 14px; line-height: 1.5; margin: 2px 0; }
+  .review-row .label { color: var(--ink-dim); margin-right: 6px; }
+  .review-row .value { color: var(--ink); }
+  .review-row .selected { color: var(--crimson); }
+  .review-row.correct-answer .value { color: var(--leaf); }
 
+  /* Page navigation */
+  .page-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: -8px 0 8px;
+    font-family: 'Caveat', cursive; color: var(--ink-dim); font-size: 18px;
+  }
+  .page-nav .step { letter-spacing: 2px; text-transform: uppercase; font-size: 12px; font-family: 'Special Elite', monospace; color: var(--gold); }
+  .back-link {
+    background: none; border: none; color: var(--ink-dim);
+    font-family: 'Caveat', cursive; font-size: 18px; cursor: pointer; padding: 0;
+  }
+  .back-link:hover { color: var(--gold); }
 
   .diff-label {
     text-align: center;
     font-family: 'Caveat', cursive;
-    color: var(--chalk-dim);
+    color: var(--ink-dim);
     font-size: 20px;
     margin: 18px 0 8px;
   }
@@ -354,71 +386,74 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin: 0 auto 18px;
-    max-width: 460px;
+    max-width: 500px;
   }
   .diff-btn {
     cursor: pointer;
     font-family: 'Special Elite', monospace;
-    background: transparent;
-    color: var(--chalk);
-    border: 2px dashed var(--chalk-dim);
-    border-radius: 8px;
-    padding: 10px 6px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    color: var(--ink);
+    border: 1px solid rgba(232,197,107,0.22);
+    border-radius: 12px;
+    padding: 12px 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
     transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   }
-  .diff-btn:hover { border-color: var(--chalk-yellow); color: var(--chalk-yellow); transform: translateY(-2px); }
+  .diff-btn:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
   .diff-btn.selected {
-    border-style: solid;
-    border-color: var(--chalk-yellow);
-    background: rgba(245,215,110,0.14);
-    color: var(--chalk-yellow);
-    box-shadow: inset 0 0 0 1px rgba(245,215,110,0.35);
+    border-color: var(--gold);
+    background: linear-gradient(180deg, rgba(232,197,107,0.20), rgba(232,197,107,0.06));
+    color: var(--gold-bright);
+    box-shadow: 0 0 0 1px rgba(232,197,107,0.35), 0 8px 24px -12px rgba(232,197,107,0.5);
   }
   .diff-name { font-family: 'Shadows Into Light', cursive; font-size: 22px; letter-spacing: 1px; }
-  .diff-blurb { font-family: 'Caveat', cursive; font-size: 16px; color: var(--chalk-dim); }
-  .diff-btn.selected .diff-blurb { color: var(--chalk); }
-  .diff-count { font-size: 11px; letter-spacing: 1px; opacity: 0.7; text-transform: uppercase; }
+  .diff-blurb { font-family: 'Caveat', cursive; font-size: 16px; color: var(--ink-dim); }
+  .diff-btn.selected .diff-blurb { color: var(--ink); }
+  .diff-count { font-size: 11px; letter-spacing: 1px; opacity: 0.75; text-transform: uppercase; }
 
-  .category-chip.diff-easy { background: transparent; border: 2px solid var(--chalk-green); color: var(--chalk-green); }
-  .category-chip.diff-medium { background: transparent; border: 2px solid var(--chalk-yellow); color: var(--chalk-yellow); }
-  .category-chip.diff-hard { background: transparent; border: 2px solid var(--chalk-red); color: var(--chalk-red); }
-  .diff-chip {
-    font-size: 14px;
-    padding: 2px 8px;
-    transform: rotate(2deg);
-    margin-left: 6px;
-  }
+  .category-chip.diff-easy { background: transparent; border: 1px solid var(--leaf); color: var(--leaf); }
+  .category-chip.diff-medium { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+  .category-chip.diff-hard { background: transparent; border: 1px solid var(--crimson); color: var(--crimson); }
+  .diff-chip { font-size: 14px; padding: 2px 10px; transform: rotate(2deg); margin-left: 6px; }
 
   /* Category picker */
   .cat-group {
     display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
-    max-width: 500px; margin: 0 auto 6px;
+    max-width: 540px; margin: 0 auto 6px;
   }
   .cat-chip {
     cursor: pointer;
     font-family: 'Special Elite', monospace;
     font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
-    background: transparent; color: var(--chalk-dim);
-    border: 2px dashed var(--chalk-dim);
-    border-radius: 20px; padding: 6px 14px;
+    background: rgba(255,255,255,0.03); color: var(--ink-dim);
+    border: 1px solid rgba(232,197,107,0.28);
+    border-radius: 999px; padding: 7px 14px;
     transition: all 0.15s ease;
   }
-  .cat-chip:hover { color: var(--chalk); border-color: var(--chalk); }
+  .cat-chip:hover { color: var(--ink); border-color: var(--gold); }
   .cat-chip.selected {
-    border-style: solid; color: var(--board);
-    background: var(--chalk-yellow); border-color: var(--chalk-yellow);
+    color: var(--wine-dark);
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+    border-color: var(--gold);
+    box-shadow: 0 4px 14px -6px rgba(232,197,107,0.6);
   }
+  .cat-actions { display:flex; gap: 8px; justify-content:center; margin: 8px 0 6px; }
+  .cat-actions .mini {
+    background: none; border: none; color: var(--ink-muted);
+    font-family: 'Caveat', cursive; font-size: 16px; cursor: pointer;
+    text-decoration: underline dotted;
+  }
+  .cat-actions .mini:hover { color: var(--gold); }
 
   /* Level grid */
   .level-grid {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     gap: 6px;
-    max-width: 520px;
+    max-width: 560px;
     margin: 4px auto 10px;
   }
   .level-btn {
@@ -426,52 +461,64 @@
     cursor: pointer;
     font-family: 'Shadows Into Light', cursive;
     font-size: 18px;
-    background: transparent;
-    color: var(--chalk);
-    border: 2px dashed rgba(245,241,230,0.35);
-    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    color: var(--ink);
+    border: 1px solid rgba(232,197,107,0.22);
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     padding: 0;
     transition: all 0.15s ease;
   }
   .level-btn:hover:not(:disabled) {
-    border-color: var(--chalk-yellow); color: var(--chalk-yellow);
+    border-color: var(--gold); color: var(--gold-bright);
     transform: translateY(-1px);
+    background: rgba(232,197,107,0.10);
   }
   .level-btn.cleared {
-    border-style: solid;
-    border-color: var(--chalk-green);
-    color: var(--chalk-green);
+    border-color: var(--leaf);
+    color: var(--leaf);
     background: rgba(126,217,87,0.10);
   }
   .level-btn.current {
-    border-style: solid;
-    border-color: var(--chalk-yellow);
-    color: var(--chalk-yellow);
-    background: rgba(245,215,110,0.16);
-    box-shadow: 0 0 0 2px rgba(245,215,110,0.25);
+    border-color: var(--gold);
+    color: var(--wine-dark);
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+    box-shadow: 0 0 0 2px rgba(232,197,107,0.35), 0 6px 18px -6px rgba(232,197,107,0.6);
   }
   .level-btn:disabled {
     opacity: 0.35; cursor: not-allowed;
-    color: var(--chalk-dim); border-color: rgba(245,241,230,0.15);
+    color: var(--ink-muted); border-color: rgba(232,197,107,0.10);
   }
   .level-hint {
     text-align: center; font-family: 'Caveat', cursive;
-    color: var(--chalk-dim); font-size: 17px; margin: 2px 0 10px;
+    color: var(--ink-dim); font-size: 17px; margin: 2px 0 10px;
   }
   .level-header {
     display: flex; justify-content: space-between; align-items: baseline;
-    max-width: 520px; margin: 0 auto 4px;
-    font-family: 'Caveat', cursive; color: var(--chalk-dim); font-size: 18px;
+    max-width: 560px; margin: 0 auto 6px;
+    font-family: 'Caveat', cursive; color: var(--ink-dim); font-size: 18px;
   }
-  .level-header strong { color: var(--chalk-yellow); font-family: 'Shadows Into Light', cursive; font-size: 22px; }
+  .level-header strong { color: var(--gold); font-family: 'Shadows Into Light', cursive; font-size: 22px; }
+
+  .summary-card {
+    max-width: 480px; margin: 6px auto 14px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(232,197,107,0.22);
+    border-radius: 12px;
+    font-family: 'Caveat', cursive; font-size: 18px;
+    color: var(--ink-dim);
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+  }
+  .summary-card strong { color: var(--gold); font-family: 'Shadows Into Light', cursive; font-size: 20px; }
 
   @media (max-width: 520px) {
     .level-grid { grid-template-columns: repeat(6, 1fr); }
   }
   @media (max-width: 420px) {
-    .frame { padding: 10px; }
-    .board { padding: 22px 16px 18px; }
+    .frame { padding: 2px; }
+    .board { padding: 24px 16px 20px; }
     .option { font-size: 15px; }
     .diff-group { grid-template-columns: 1fr; }
     .level-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; }
@@ -939,20 +986,57 @@
   }
 
   // ---- Screens ----
-  function renderStart() {
+  function renderStart() { renderHome(); }
+
+  function renderHome() {
     clearBoard();
-    const title = el("h1", { class: "title", text: "The Daily Special" });
-    const sub = el("p", { class: "subtitle", text: "~ Food Trivia Quiz ~" });
+    const brand = el("p", { class: "brand", text: "· The Daily Special ·" });
+    const title = el("h1", { class: "title", text: "Food Trivia" });
+    const sub = el("p", { class: "subtitle", text: "~ a tasting menu of tasty questions ~" });
     const hr = el("hr", { class: "rule" });
     const desc = el("p", {
       class: "description",
-      text: "Pick your categories, choose a difficulty, and work through 50 levels of tasty trivia."
+      text: "Test your palate across world cuisines, nutrition, and food science. 50 levels of five‑question rounds, a 20‑second timer, and a bite of trivia after every answer."
     });
+
+    const summary = el("div", { class: "summary-card" }, [
+      el("span", {}, [
+        document.createTextNode("Difficulty "),
+        el("strong", { text: difficulty.charAt(0).toUpperCase() + difficulty.slice(1) })
+      ]),
+      el("span", {}, [
+        document.createTextNode("Categories "),
+        el("strong", { text: String(selectedCategories.size) + "/" + ALL_CATEGORIES.length })
+      ]),
+      el("span", {}, [
+        document.createTextNode("Progress "),
+        el("strong", { text: "Lv " + unlocked[difficulty] + " / " + TOTAL_LEVELS })
+      ])
+    ]);
+
+    const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
+      el("button", { class: "btn", text: "Start Cooking →", on: { click: renderCategories } }),
+      el("button", { class: "btn ghost", text: "Jump to Levels", on: { click: renderLevels } })
+    ]);
+
+    const note = el("p", { class: "footer-note", text: "Tip: clear a level to unlock the next. Score at least 60%." });
+
+    board.append(brand, title, sub, hr, desc, summary, actions, note);
+  }
+
+  function renderCategories() {
+    clearBoard();
+    const nav = el("div", { class: "page-nav" }, [
+      el("button", { class: "back-link", text: "← Home", on: { click: renderHome } }),
+      el("span", { class: "step", text: "Step 1 of 2" })
+    ]);
+    const title = el("h1", { class: "title", text: "Pick Your Menu" });
+    const sub = el("p", { class: "subtitle", text: "Choose categories and difficulty" });
+    const hr = el("hr", { class: "rule" });
 
     // Category picker
     const catLabel = el("p", { class: "diff-label", text: "Categories" });
     const catWrap = el("div", { class: "cat-group", attrs: { role: "group", "aria-label": "Categories" } });
-    const catButtons = [];
     ALL_CATEGORIES.forEach(name => {
       const chip = el("button", {
         class: "cat-chip" + (selectedCategories.has(name) ? " selected" : ""),
@@ -961,53 +1045,78 @@
         on: {
           click: () => {
             if (selectedCategories.has(name)) {
-              if (selectedCategories.size === 1) return; // keep at least one
+              if (selectedCategories.size === 1) return;
               selectedCategories.delete(name);
             } else {
               selectedCategories.add(name);
             }
-            renderStart(); // re-render to refresh level counts/labels
+            renderCategories();
           }
         }
       });
-      catButtons.push(chip);
       catWrap.appendChild(chip);
     });
+    const catActions = el("div", { class: "cat-actions" }, [
+      el("button", { class: "mini", text: "Select all", on: { click: () => { ALL_CATEGORIES.forEach(c => selectedCategories.add(c)); renderCategories(); } } }),
+      el("button", { class: "mini", text: "Only one", on: { click: () => { selectedCategories = new Set([ALL_CATEGORIES[0]]); renderCategories(); } } })
+    ]);
 
     // Difficulty picker
     const diffLabel = el("p", { class: "diff-label", text: "Choose your difficulty" });
     const diffWrap = el("div", { class: "diff-group", attrs: { role: "radiogroup", "aria-label": "Difficulty" } });
-    const diffButtons = [];
     DIFFICULTIES.forEach(d => {
       const pool = filteredPool(d.key);
       const btn = el("button", {
         class: "diff-btn" + (d.key === difficulty ? " selected" : ""),
         attrs: { type: "button", "data-diff": d.key, "aria-pressed": d.key === difficulty ? "true" : "false" },
-        on: {
-          click: () => {
-            difficulty = d.key;
-            renderStart();
-          }
-        }
+        on: { click: () => { difficulty = d.key; renderCategories(); } }
       }, [
         el("span", { class: "diff-name", text: d.label }),
         el("span", { class: "diff-blurb", text: d.blurb }),
         el("span", { class: "diff-count", text: pool.length + " Qs · Lv " + unlocked[d.key] + "/" + TOTAL_LEVELS })
       ]);
-      diffButtons.push(btn);
       diffWrap.appendChild(btn);
     });
 
-    // Level grid header
+    const canContinue = filteredPool(difficulty).length > 0;
+    const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
+      el("button", { class: "btn ghost", text: "← Back", on: { click: renderHome } }),
+      el("button", {
+        class: "btn",
+        text: "Choose Level →",
+        attrs: canContinue ? {} : { disabled: "true" },
+        on: { click: () => { if (canContinue) renderLevels(); } }
+      })
+    ]);
+
+    const hint = el("p", {
+      class: "level-hint",
+      text: canContinue
+        ? "You can change these anytime."
+        : "No questions match — pick at least one category with questions in this difficulty."
+    });
+
+    board.append(nav, title, sub, hr, catLabel, catWrap, catActions, diffLabel, diffWrap, actions, hint);
+  }
+
+  function renderLevels() {
+    clearBoard();
+    const nav = el("div", { class: "page-nav" }, [
+      el("button", { class: "back-link", text: "← Categories", on: { click: renderCategories } }),
+      el("span", { class: "step", text: "Step 2 of 2" })
+    ]);
+    const title = el("h1", { class: "title", text: "Choose a Level" });
+    const sub = el("p", { class: "subtitle", text: difficulty.charAt(0).toUpperCase() + difficulty.slice(1) + " · " + selectedCategories.size + " categor" + (selectedCategories.size === 1 ? "y" : "ies") });
+    const hr = el("hr", { class: "rule" });
+
     const header = el("div", { class: "level-header" }, [
-      el("span", { text: "Select a level" }),
+      el("span", { text: "50 rounds of 5 questions" }),
       el("span", {}, [
         document.createTextNode("Unlocked: "),
         el("strong", { text: unlocked[difficulty] + " / " + TOTAL_LEVELS })
       ])
     ]);
 
-    // Level grid
     const pool = filteredPool(difficulty);
     const grid = el("div", { class: "level-grid", attrs: { role: "list", "aria-label": "Levels" } });
     for (let lv = 1; lv <= TOTAL_LEVELS; lv++) {
@@ -1018,13 +1127,7 @@
         class: "level-btn" + (isCleared ? " cleared" : "") + (isCurrent ? " current" : ""),
         text: String(lv),
         attrs: { type: "button", "aria-label": "Level " + lv, ...(isUnlocked ? {} : { disabled: "true" }) },
-        on: {
-          click: () => {
-            if (!isUnlocked) return;
-            currentLevel = lv;
-            startGame();
-          }
-        }
+        on: { click: () => { if (!isUnlocked) return; currentLevel = lv; startGame(); } }
       });
       grid.appendChild(b);
     }
@@ -1032,12 +1135,17 @@
     const hint = el("p", {
       class: "level-hint",
       text: pool.length === 0
-        ? "No questions match your category picks for this difficulty — try adding a category."
+        ? "No questions match your category picks for this difficulty — go back and add a category."
         : "Clear a level to unlock the next. Answers shuffle every round."
     });
 
-    board.append(title, sub, hr, desc, catLabel, catWrap, diffLabel, diffWrap, header, grid, hint);
+    const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
+      el("button", { class: "btn ghost", text: "← Change menu", on: { click: renderCategories } })
+    ]);
+
+    board.append(nav, title, sub, hr, header, grid, hint, actions);
   }
+
 
   function startGame() {
     const chosen = buildLevelQuestions(difficulty, currentLevel);
@@ -1305,7 +1413,7 @@
     actions.appendChild(el("button", {
       class: "btn",
       text: "Level Select",
-      on: { click: renderStart }
+      on: { click: renderLevels }
     }));
 
     const noteText = timedOut
