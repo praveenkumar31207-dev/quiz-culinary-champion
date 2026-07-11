@@ -986,20 +986,57 @@
   }
 
   // ---- Screens ----
-  function renderStart() {
+  function renderStart() { renderHome(); }
+
+  function renderHome() {
     clearBoard();
-    const title = el("h1", { class: "title", text: "The Daily Special" });
-    const sub = el("p", { class: "subtitle", text: "~ Food Trivia Quiz ~" });
+    const brand = el("p", { class: "brand", text: "· The Daily Special ·" });
+    const title = el("h1", { class: "title", text: "Food Trivia" });
+    const sub = el("p", { class: "subtitle", text: "~ a tasting menu of tasty questions ~" });
     const hr = el("hr", { class: "rule" });
     const desc = el("p", {
       class: "description",
-      text: "Pick your categories, choose a difficulty, and work through 50 levels of tasty trivia."
+      text: "Test your palate across world cuisines, nutrition, and food science. 50 levels of five‑question rounds, a 20‑second timer, and a bite of trivia after every answer."
     });
+
+    const summary = el("div", { class: "summary-card" }, [
+      el("span", {}, [
+        document.createTextNode("Difficulty "),
+        el("strong", { text: difficulty.charAt(0).toUpperCase() + difficulty.slice(1) })
+      ]),
+      el("span", {}, [
+        document.createTextNode("Categories "),
+        el("strong", { text: String(selectedCategories.size) + "/" + ALL_CATEGORIES.length })
+      ]),
+      el("span", {}, [
+        document.createTextNode("Progress "),
+        el("strong", { text: "Lv " + unlocked[difficulty] + " / " + TOTAL_LEVELS })
+      ])
+    ]);
+
+    const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
+      el("button", { class: "btn", text: "Start Cooking →", on: { click: renderCategories } }),
+      el("button", { class: "btn ghost", text: "Jump to Levels", on: { click: renderLevels } })
+    ]);
+
+    const note = el("p", { class: "footer-note", text: "Tip: clear a level to unlock the next. Score at least 60%." });
+
+    board.append(brand, title, sub, hr, desc, summary, actions, note);
+  }
+
+  function renderCategories() {
+    clearBoard();
+    const nav = el("div", { class: "page-nav" }, [
+      el("button", { class: "back-link", text: "← Home", on: { click: renderHome } }),
+      el("span", { class: "step", text: "Step 1 of 2" })
+    ]);
+    const title = el("h1", { class: "title", text: "Pick Your Menu" });
+    const sub = el("p", { class: "subtitle", text: "Choose categories and difficulty" });
+    const hr = el("hr", { class: "rule" });
 
     // Category picker
     const catLabel = el("p", { class: "diff-label", text: "Categories" });
     const catWrap = el("div", { class: "cat-group", attrs: { role: "group", "aria-label": "Categories" } });
-    const catButtons = [];
     ALL_CATEGORIES.forEach(name => {
       const chip = el("button", {
         class: "cat-chip" + (selectedCategories.has(name) ? " selected" : ""),
@@ -1008,53 +1045,78 @@
         on: {
           click: () => {
             if (selectedCategories.has(name)) {
-              if (selectedCategories.size === 1) return; // keep at least one
+              if (selectedCategories.size === 1) return;
               selectedCategories.delete(name);
             } else {
               selectedCategories.add(name);
             }
-            renderStart(); // re-render to refresh level counts/labels
+            renderCategories();
           }
         }
       });
-      catButtons.push(chip);
       catWrap.appendChild(chip);
     });
+    const catActions = el("div", { class: "cat-actions" }, [
+      el("button", { class: "mini", text: "Select all", on: { click: () => { ALL_CATEGORIES.forEach(c => selectedCategories.add(c)); renderCategories(); } } }),
+      el("button", { class: "mini", text: "Only one", on: { click: () => { selectedCategories = new Set([ALL_CATEGORIES[0]]); renderCategories(); } } })
+    ]);
 
     // Difficulty picker
     const diffLabel = el("p", { class: "diff-label", text: "Choose your difficulty" });
     const diffWrap = el("div", { class: "diff-group", attrs: { role: "radiogroup", "aria-label": "Difficulty" } });
-    const diffButtons = [];
     DIFFICULTIES.forEach(d => {
       const pool = filteredPool(d.key);
       const btn = el("button", {
         class: "diff-btn" + (d.key === difficulty ? " selected" : ""),
         attrs: { type: "button", "data-diff": d.key, "aria-pressed": d.key === difficulty ? "true" : "false" },
-        on: {
-          click: () => {
-            difficulty = d.key;
-            renderStart();
-          }
-        }
+        on: { click: () => { difficulty = d.key; renderCategories(); } }
       }, [
         el("span", { class: "diff-name", text: d.label }),
         el("span", { class: "diff-blurb", text: d.blurb }),
         el("span", { class: "diff-count", text: pool.length + " Qs · Lv " + unlocked[d.key] + "/" + TOTAL_LEVELS })
       ]);
-      diffButtons.push(btn);
       diffWrap.appendChild(btn);
     });
 
-    // Level grid header
+    const canContinue = filteredPool(difficulty).length > 0;
+    const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
+      el("button", { class: "btn ghost", text: "← Back", on: { click: renderHome } }),
+      el("button", {
+        class: "btn",
+        text: "Choose Level →",
+        attrs: canContinue ? {} : { disabled: "true" },
+        on: { click: () => { if (canContinue) renderLevels(); } }
+      })
+    ]);
+
+    const hint = el("p", {
+      class: "level-hint",
+      text: canContinue
+        ? "You can change these anytime."
+        : "No questions match — pick at least one category with questions in this difficulty."
+    });
+
+    board.append(nav, title, sub, hr, catLabel, catWrap, catActions, diffLabel, diffWrap, actions, hint);
+  }
+
+  function renderLevels() {
+    clearBoard();
+    const nav = el("div", { class: "page-nav" }, [
+      el("button", { class: "back-link", text: "← Categories", on: { click: renderCategories } }),
+      el("span", { class: "step", text: "Step 2 of 2" })
+    ]);
+    const title = el("h1", { class: "title", text: "Choose a Level" });
+    const sub = el("p", { class: "subtitle", text: difficulty.charAt(0).toUpperCase() + difficulty.slice(1) + " · " + selectedCategories.size + " categor" + (selectedCategories.size === 1 ? "y" : "ies") });
+    const hr = el("hr", { class: "rule" });
+
     const header = el("div", { class: "level-header" }, [
-      el("span", { text: "Select a level" }),
+      el("span", { text: "50 rounds of 5 questions" }),
       el("span", {}, [
         document.createTextNode("Unlocked: "),
         el("strong", { text: unlocked[difficulty] + " / " + TOTAL_LEVELS })
       ])
     ]);
 
-    // Level grid
     const pool = filteredPool(difficulty);
     const grid = el("div", { class: "level-grid", attrs: { role: "list", "aria-label": "Levels" } });
     for (let lv = 1; lv <= TOTAL_LEVELS; lv++) {
@@ -1065,13 +1127,7 @@
         class: "level-btn" + (isCleared ? " cleared" : "") + (isCurrent ? " current" : ""),
         text: String(lv),
         attrs: { type: "button", "aria-label": "Level " + lv, ...(isUnlocked ? {} : { disabled: "true" }) },
-        on: {
-          click: () => {
-            if (!isUnlocked) return;
-            currentLevel = lv;
-            startGame();
-          }
-        }
+        on: { click: () => { if (!isUnlocked) return; currentLevel = lv; startGame(); } }
       });
       grid.appendChild(b);
     }
@@ -1079,12 +1135,17 @@
     const hint = el("p", {
       class: "level-hint",
       text: pool.length === 0
-        ? "No questions match your category picks for this difficulty — try adding a category."
+        ? "No questions match your category picks for this difficulty — go back and add a category."
         : "Clear a level to unlock the next. Answers shuffle every round."
     });
 
-    board.append(title, sub, hr, desc, catLabel, catWrap, diffLabel, diffWrap, header, grid, hint);
+    const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
+      el("button", { class: "btn ghost", text: "← Change menu", on: { click: renderCategories } })
+    ]);
+
+    board.append(nav, title, sub, hr, header, grid, hint, actions);
   }
+
 
   function startGame() {
     const chosen = buildLevelQuestions(difficulty, currentLevel);
