@@ -1005,6 +1005,10 @@
   function clearBoard() {
     stopTimer();
     while (board.firstChild) board.removeChild(board.firstChild);
+    board.classList.remove("enter");
+    // Force reflow so the animation re-triggers on every screen swap.
+    void board.offsetWidth;
+    board.classList.add("enter");
   }
 
   function filteredPool(diffKey) {
