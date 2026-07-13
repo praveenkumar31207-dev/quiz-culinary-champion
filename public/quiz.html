@@ -1387,6 +1387,7 @@
     // Mark the current question as wrong (no selection)
     const q = questions[currentIndex];
     results.push({ correct: false, selectedIdx: null, question: q });
+    playWrong();
     // End the round immediately — time ran out
     renderResults(true);
   }
