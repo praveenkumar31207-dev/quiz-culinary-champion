@@ -955,6 +955,72 @@
 
   const board = document.getElementById("board");
 
+  // ---- Sound (Web Audio, no assets) ----
+  const SFX_KEY = "foodTrivia.muted";
+  let muted = (function () {
+    try { return localStorage.getItem(SFX_KEY) === "1"; } catch (_) { return false; }
+  })();
+  let audioCtx = null;
+  function getCtx() {
+    if (muted) return null;
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      try { audioCtx = new AC(); } catch (_) { return null; }
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+    return audioCtx;
+  }
+  function tone(freq, dur, when, type, gain) {
+    const ctx = getCtx(); if (!ctx) return;
+    const t0 = ctx.currentTime + (when || 0);
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(gain || 0.12, t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(t0); osc.stop(t0 + dur + 0.02);
+  }
+  function playCorrect() {
+    // Gentle two-note chime (E5 → A5)
+    tone(659.25, 0.18, 0,    "sine",     0.10);
+    tone(880.00, 0.28, 0.09, "triangle", 0.10);
+  }
+  function playWrong() {
+    // Soft downward buzz (A3 → E3)
+    tone(220.00, 0.18, 0,    "sine",     0.09);
+    tone(164.81, 0.28, 0.08, "sine",     0.09);
+  }
+  function setMuted(v) {
+    muted = !!v;
+    try { localStorage.setItem(SFX_KEY, muted ? "1" : "0"); } catch (_) {}
+    const btn = document.getElementById("mute-btn");
+    if (btn) {
+      btn.textContent = muted ? "🔇 Sound off" : "🔊 Sound on";
+      btn.setAttribute("aria-pressed", muted ? "true" : "false");
+      btn.setAttribute("aria-label", muted ? "Unmute sound effects" : "Mute sound effects");
+    }
+  }
+  function makeMuteButton() {
+    const btn = el("button", {
+      class: "mute-btn",
+      attrs: {
+        id: "mute-btn",
+        type: "button",
+        "aria-pressed": muted ? "true" : "false",
+        "aria-label": muted ? "Unmute sound effects" : "Mute sound effects",
+        title: "Toggle sound effects"
+      },
+      text: muted ? "🔇 Sound off" : "🔊 Sound on",
+      on: { click: () => setMuted(!muted) }
+    });
+    return btn;
+  }
+
+
   // ---- Utilities ----
   function shuffle(arr) {
     const a = arr.slice();
