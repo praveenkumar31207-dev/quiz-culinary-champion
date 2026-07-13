@@ -1307,41 +1307,147 @@
     const hr = el("hr", { class: "rule" });
 
     const header = el("div", { class: "level-header" }, [
-      el("span", { text: "50 rounds of 5 questions" }),
+      el("span", { text: TOTAL_LEVELS + " rounds · length & timer scale up" }),
       el("span", {}, [
         document.createTextNode("Unlocked: "),
         el("strong", { text: unlocked[difficulty] + " / " + TOTAL_LEVELS })
       ])
     ]);
 
+    // Search
+    const searchInput = el("input", {
+      attrs: {
+        type: "search",
+        inputmode: "numeric",
+        placeholder: "Search levels (e.g. 42, 1-25, cleared, current, locked)…",
+        "aria-label": "Search levels"
+      }
+    });
+    const clearBtn = el("button", {
+      class: "clear-btn", text: "Clear",
+      attrs: { type: "button" },
+      on: { click: () => { searchInput.value = ""; applyFilter(); searchInput.focus(); } }
+    });
+    const search = el("div", { class: "level-search" }, [searchInput, clearBtn]);
+
+    // Preview panel
+    const preview = el("div", {
+      class: "level-preview",
+      attrs: { id: "level-preview", "aria-live": "polite" }
+    });
+
     const pool = filteredPool(difficulty);
     const grid = el("div", { class: "level-grid", attrs: { role: "list", "aria-label": "Levels" } });
+    const empty = el("p", { class: "level-empty hidden", text: "No levels match that search." });
+
+    const tiles = [];
     for (let lv = 1; lv <= TOTAL_LEVELS; lv++) {
       const isUnlocked = lv <= unlocked[difficulty] && pool.length > 0;
       const isCleared = lv < unlocked[difficulty];
       const isCurrent = lv === unlocked[difficulty] && pool.length > 0;
+      const qs = questionsForLevel(lv);
+      const secs = timerForLevel(difficulty, lv);
       const b = el("button", {
         class: "level-btn" + (isCleared ? " cleared" : "") + (isCurrent ? " current" : ""),
-        text: String(lv),
-        attrs: { type: "button", "aria-label": "Level " + lv, ...(isUnlocked ? {} : { disabled: "true" }) },
-        on: { click: () => { if (!isUnlocked) return; currentLevel = lv; startGame(); } }
-      });
+        attrs: {
+          type: "button",
+          "aria-label": "Level " + lv + " — " + qs + " questions, " + secs + " seconds each",
+          title: "Level " + lv + " · " + qs + " Qs · " + secs + "s each",
+          ...(isUnlocked ? {} : { disabled: "true" })
+        },
+        on: {
+          click: () => { if (!isUnlocked) return; currentLevel = lv; startGame(); },
+          mouseenter: () => showPreview(lv, isUnlocked, isCleared, isCurrent),
+          focus: () => showPreview(lv, isUnlocked, isCleared, isCurrent)
+        }
+      }, [
+        el("span", { class: "lv-num", text: String(lv) }),
+        el("span", { class: "lv-meta", text: qs + "Q·" + secs + "s" })
+      ]);
+      b.dataset.level = String(lv);
+      b.dataset.state = isCleared ? "cleared" : isCurrent ? "current" : isUnlocked ? "unlocked" : "locked";
+      tiles.push(b);
       grid.appendChild(b);
     }
+
+    function showPreview(lv, isUnlocked, isCleared, isCurrent) {
+      const qs = questionsForLevel(lv);
+      const secs = timerForLevel(difficulty, lv);
+      const status = isCleared ? "Cleared" : isCurrent ? "Current" : isUnlocked ? "Ready" : "Locked";
+      preview.replaceChildren(
+        el("span", {}, [
+          document.createTextNode("Level "),
+          el("strong", { text: String(lv) }),
+          document.createTextNode(" · " + status)
+        ]),
+        el("span", {}, [
+          el("strong", { text: String(qs) }),
+          document.createTextNode(" questions")
+        ]),
+        el("span", {}, [
+          el("strong", { text: secs + "s" }),
+          document.createTextNode(" per question")
+        ])
+      );
+    }
+    // Default preview = current level (or level 1)
+    const focusLv = Math.min(unlocked[difficulty] || 1, TOTAL_LEVELS);
+    showPreview(focusLv, focusLv <= unlocked[difficulty] && pool.length > 0, focusLv < unlocked[difficulty], focusLv === unlocked[difficulty]);
+
+    function applyFilter() {
+      const raw = (searchInput.value || "").trim().toLowerCase();
+      let match;
+      if (!raw) {
+        match = () => true;
+      } else {
+        const rangeM = raw.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+        const numM = raw.match(/^\d+$/);
+        if (rangeM) {
+          const lo = Math.min(+rangeM[1], +rangeM[2]);
+          const hi = Math.max(+rangeM[1], +rangeM[2]);
+          match = (lv, state) => lv >= lo && lv <= hi;
+        } else if (numM) {
+          const n = +numM;
+          match = (lv) => String(lv).includes(raw);
+        } else if (["cleared", "current", "unlocked", "locked", "ready"].includes(raw)) {
+          const target = raw === "ready" ? "unlocked" : raw;
+          match = (lv, state) => state === target;
+        } else {
+          match = () => false;
+        }
+      }
+      let shown = 0;
+      let firstVisible = null;
+      tiles.forEach(t => {
+        const lv = +t.dataset.level;
+        const ok = match(lv, t.dataset.state);
+        t.classList.toggle("hidden", !ok);
+        if (ok) { shown++; if (firstVisible == null) firstVisible = lv; }
+      });
+      empty.classList.toggle("hidden", shown !== 0);
+      if (firstVisible != null) {
+        const lv = firstVisible;
+        const isUnlocked = lv <= unlocked[difficulty] && pool.length > 0;
+        showPreview(lv, isUnlocked, lv < unlocked[difficulty], lv === unlocked[difficulty] && pool.length > 0);
+      }
+    }
+    searchInput.addEventListener("input", applyFilter);
 
     const hint = el("p", {
       class: "level-hint",
       text: pool.length === 0
         ? "No questions match your category picks for this difficulty — go back and add a category."
-        : "Clear a level to unlock the next. Answers shuffle every round."
+        : "Clear a level to unlock the next. Search by number, range (e.g. 20-40), or status."
     });
 
     const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
       el("button", { class: "btn ghost", text: "← Change menu", on: { click: renderCategories } })
     ]);
 
-    board.append(nav, title, sub, hr, header, grid, hint, actions);
+    board.append(nav, title, sub, hr, header, search, preview, grid, empty, hint, actions);
   }
+
+
 
 
   function startGame() {
