@@ -1456,7 +1456,7 @@
     const fill = document.getElementById("timer-fill");
     const clock = document.getElementById("timer-clock");
     if (!fill || !clock) return;
-    const pct = Math.max(0, timeLeft) / TIMER_SECONDS;
+    const pct = Math.max(0, timeLeft) / timerForLevel(difficulty, currentLevel);
     fill.style.transform = "scaleX(" + pct + ")";
     fill.classList.toggle("warn", timeLeft <= 10 && timeLeft > 5);
     fill.classList.toggle("danger", timeLeft <= 5);
