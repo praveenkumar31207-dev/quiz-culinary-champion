@@ -512,27 +512,36 @@
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     gap: 6px;
-    max-width: 560px;
+    max-width: 620px;
     margin: 4px auto 10px;
   }
   .level-btn {
     aspect-ratio: 1 / 1;
     cursor: pointer;
     font-family: 'Shadows Into Light', cursive;
-    font-size: 18px;
     background: rgba(255,255,255,0.03);
     color: var(--ink);
     border: 1px solid rgba(232,197,107,0.22);
     border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    padding: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2px;
+    line-height: 1;
     transition: all 0.15s ease;
+  }
+  .level-btn .lv-num { font-size: 18px; }
+  .level-btn .lv-meta {
+    font-family: 'Caveat', cursive;
+    font-size: 11px;
+    color: var(--ink-dim);
+    margin-top: 2px;
+    letter-spacing: 0.2px;
   }
   .level-btn:hover:not(:disabled) {
     border-color: var(--gold); color: var(--gold-bright);
     transform: translateY(-1px);
     background: rgba(232,197,107,0.10);
   }
+  .level-btn:hover:not(:disabled) .lv-meta { color: var(--gold-bright); }
   .level-btn.cleared {
     border-color: var(--leaf);
     color: var(--leaf);
@@ -544,20 +553,64 @@
     background: linear-gradient(180deg, var(--gold-bright), var(--gold));
     box-shadow: 0 0 0 2px rgba(232,197,107,0.35), 0 6px 18px -6px rgba(232,197,107,0.6);
   }
+  .level-btn.current .lv-meta { color: var(--wine-dark); }
   .level-btn:disabled {
     opacity: 0.35; cursor: not-allowed;
     color: var(--ink-muted); border-color: rgba(232,197,107,0.10);
   }
+  .level-btn.hidden { display: none; }
   .level-hint {
     text-align: center; font-family: 'Caveat', cursive;
     color: var(--ink-dim); font-size: 17px; margin: 2px 0 10px;
   }
   .level-header {
     display: flex; justify-content: space-between; align-items: baseline;
-    max-width: 560px; margin: 0 auto 6px;
+    max-width: 620px; margin: 0 auto 6px;
     font-family: 'Caveat', cursive; color: var(--ink-dim); font-size: 18px;
   }
   .level-header strong { color: var(--gold); font-family: 'Shadows Into Light', cursive; font-size: 22px; }
+
+  .level-search {
+    max-width: 620px; margin: 0 auto 8px;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .level-search input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(232,197,107,0.28);
+    color: var(--ink);
+    font-family: 'Caveat', cursive; font-size: 18px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .level-search input::placeholder { color: var(--ink-muted); }
+  .level-search input:focus { border-color: var(--gold); background: rgba(232,197,107,0.08); }
+  .level-search .clear-btn {
+    background: transparent; border: 1px solid rgba(232,197,107,0.28);
+    color: var(--ink-dim); font-family: 'Caveat', cursive; font-size: 16px;
+    padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .level-search .clear-btn:hover { color: var(--gold); border-color: var(--gold); }
+  .level-preview {
+    max-width: 620px; margin: 0 auto 10px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(232,197,107,0.28);
+    border-radius: 10px;
+    font-family: 'Caveat', cursive; font-size: 17px;
+    color: var(--ink-dim);
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .level-preview strong { color: var(--gold); font-family: 'Shadows Into Light', cursive; font-size: 20px; }
+  .level-empty {
+    text-align: center; font-family: 'Caveat', cursive;
+    color: var(--ink-muted); font-size: 18px; padding: 12px 0;
+  }
+
 
   .summary-card {
     max-width: 480px; margin: 6px auto 14px;
