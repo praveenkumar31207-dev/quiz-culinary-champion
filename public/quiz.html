@@ -1436,7 +1436,7 @@
 
   function startTimer() {
     stopTimer();
-    timeLeft = TIMER_SECONDS;
+    timeLeft = timerForLevel(difficulty, currentLevel);
     updateTimerUI();
     timerId = setInterval(() => {
       timeLeft -= 1;
