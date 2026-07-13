@@ -1173,7 +1173,7 @@
     const catsKey = Array.from(selectedCategories).sort().join("|");
     const seed = hashStr(diffKey + "#" + catsKey + "#L" + level);
     const shuffled = seededShuffle(pool, seed);
-    const need = Math.min(QUIZ_LENGTH, Math.max(3, pool.length));
+    const need = Math.min(questionsForLevel(level), Math.max(3, pool.length));
     const out = [];
     for (let i = 0; i < need; i++) {
       out.push(shuffled[(i + (level - 1) * 2) % shuffled.length]);
