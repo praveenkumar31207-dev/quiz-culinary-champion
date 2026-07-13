@@ -1130,7 +1130,8 @@
 
     const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
       el("button", { class: "btn", text: "Start Cooking →", on: { click: renderCategories } }),
-      el("button", { class: "btn ghost", text: "Jump to Levels", on: { click: renderLevels } })
+      el("button", { class: "btn ghost", text: "Jump to Levels", on: { click: renderLevels } }),
+      makeMuteButton()
     ]);
 
     const note = el("p", { class: "footer-note", text: "Tip: clear a level to unlock the next. Score at least 60%." });
