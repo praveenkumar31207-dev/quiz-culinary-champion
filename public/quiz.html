@@ -80,6 +80,50 @@
   }
   .board > * { position: relative; z-index: 1; }
 
+  /* Screen transitions */
+  @keyframes screenIn {
+    0%   { opacity: 0; transform: translateY(14px) scale(0.985); filter: blur(2px); }
+    60%  { filter: blur(0); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+  @keyframes childIn {
+    0%   { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes tilePop {
+    0%   { opacity: 0; transform: scale(0.85); }
+    70%  { transform: scale(1.04); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  .board.enter { animation: screenIn 420ms cubic-bezier(.2,.7,.2,1) both; }
+  .board.enter > * { animation: childIn 480ms cubic-bezier(.2,.7,.2,1) both; opacity: 0; }
+  .board.enter > *:nth-child(1) { animation-delay: 40ms; }
+  .board.enter > *:nth-child(2) { animation-delay: 90ms; }
+  .board.enter > *:nth-child(3) { animation-delay: 140ms; }
+  .board.enter > *:nth-child(4) { animation-delay: 190ms; }
+  .board.enter > *:nth-child(5) { animation-delay: 230ms; }
+  .board.enter > *:nth-child(6) { animation-delay: 270ms; }
+  .board.enter > *:nth-child(7) { animation-delay: 310ms; }
+  .board.enter > *:nth-child(8) { animation-delay: 340ms; }
+  .board.enter > *:nth-child(n+9) { animation-delay: 370ms; }
+  .board.enter .levels-grid > * { animation: tilePop 380ms cubic-bezier(.2,.9,.3,1.2) both; }
+  .board.enter .levels-grid > *:nth-child(5n+1) { animation-delay: 60ms; }
+  .board.enter .levels-grid > *:nth-child(5n+2) { animation-delay: 100ms; }
+  .board.enter .levels-grid > *:nth-child(5n+3) { animation-delay: 140ms; }
+  .board.enter .levels-grid > *:nth-child(5n+4) { animation-delay: 180ms; }
+  .board.enter .levels-grid > *:nth-child(5n+5) { animation-delay: 220ms; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .board.enter, .board.enter > *, .board.enter .levels-grid > * { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+  }
+
+  /* Interactive micro-animations */
+  .btn, .mini, .chip, .diff-card, .level-tile, .option {
+    transition: transform 180ms cubic-bezier(.2,.7,.2,1), box-shadow 180ms ease, background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+  }
+  .btn:hover, .mini:hover, .chip:hover, .diff-card:hover, .level-tile:not(.locked):hover, .option:hover { transform: translateY(-2px); }
+  .btn:active, .mini:active, .chip:active, .diff-card:active, .level-tile:not(.locked):active, .option:active { transform: translateY(0) scale(0.98); }
+
   .brand {
     text-align: center;
     font-family: 'Caveat', cursive;
