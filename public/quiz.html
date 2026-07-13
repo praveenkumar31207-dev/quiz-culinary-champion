@@ -992,9 +992,23 @@
   ];
 
 
-  const QUIZ_LENGTH = 5;      // questions per level
+  const QUIZ_LENGTH = 5;      // base questions per level
   const TOTAL_LEVELS = 100;
-  const TIMER_SECONDS = 20;   // per question countdown
+  const TIMER_SECONDS = 20;   // base per-question countdown
+
+  // Levels get gradually longer and (per difficulty) tighter on time.
+  function questionsForLevel(level) {
+    if (level <= 25) return 5;
+    if (level <= 50) return 6;
+    if (level <= 75) return 7;
+    return 8;
+  }
+  function timerForLevel(diffKey, level) {
+    const base = diffKey === "easy" ? 25 : diffKey === "hard" ? 15 : 20;
+    const step = Math.floor((level - 1) / 25); // 0..3
+    return Math.max(8, base - step * 2);
+  }
+
 
   // ---- State (in-memory only) ----
   let questions = [];
