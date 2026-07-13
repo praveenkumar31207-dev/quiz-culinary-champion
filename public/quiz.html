@@ -512,27 +512,36 @@
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     gap: 6px;
-    max-width: 560px;
+    max-width: 620px;
     margin: 4px auto 10px;
   }
   .level-btn {
     aspect-ratio: 1 / 1;
     cursor: pointer;
     font-family: 'Shadows Into Light', cursive;
-    font-size: 18px;
     background: rgba(255,255,255,0.03);
     color: var(--ink);
     border: 1px solid rgba(232,197,107,0.22);
     border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    padding: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2px;
+    line-height: 1;
     transition: all 0.15s ease;
+  }
+  .level-btn .lv-num { font-size: 18px; }
+  .level-btn .lv-meta {
+    font-family: 'Caveat', cursive;
+    font-size: 11px;
+    color: var(--ink-dim);
+    margin-top: 2px;
+    letter-spacing: 0.2px;
   }
   .level-btn:hover:not(:disabled) {
     border-color: var(--gold); color: var(--gold-bright);
     transform: translateY(-1px);
     background: rgba(232,197,107,0.10);
   }
+  .level-btn:hover:not(:disabled) .lv-meta { color: var(--gold-bright); }
   .level-btn.cleared {
     border-color: var(--leaf);
     color: var(--leaf);
@@ -544,20 +553,64 @@
     background: linear-gradient(180deg, var(--gold-bright), var(--gold));
     box-shadow: 0 0 0 2px rgba(232,197,107,0.35), 0 6px 18px -6px rgba(232,197,107,0.6);
   }
+  .level-btn.current .lv-meta { color: var(--wine-dark); }
   .level-btn:disabled {
     opacity: 0.35; cursor: not-allowed;
     color: var(--ink-muted); border-color: rgba(232,197,107,0.10);
   }
+  .level-btn.hidden { display: none; }
   .level-hint {
     text-align: center; font-family: 'Caveat', cursive;
     color: var(--ink-dim); font-size: 17px; margin: 2px 0 10px;
   }
   .level-header {
     display: flex; justify-content: space-between; align-items: baseline;
-    max-width: 560px; margin: 0 auto 6px;
+    max-width: 620px; margin: 0 auto 6px;
     font-family: 'Caveat', cursive; color: var(--ink-dim); font-size: 18px;
   }
   .level-header strong { color: var(--gold); font-family: 'Shadows Into Light', cursive; font-size: 22px; }
+
+  .level-search {
+    max-width: 620px; margin: 0 auto 8px;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .level-search input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(232,197,107,0.28);
+    color: var(--ink);
+    font-family: 'Caveat', cursive; font-size: 18px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .level-search input::placeholder { color: var(--ink-muted); }
+  .level-search input:focus { border-color: var(--gold); background: rgba(232,197,107,0.08); }
+  .level-search .clear-btn {
+    background: transparent; border: 1px solid rgba(232,197,107,0.28);
+    color: var(--ink-dim); font-family: 'Caveat', cursive; font-size: 16px;
+    padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .level-search .clear-btn:hover { color: var(--gold); border-color: var(--gold); }
+  .level-preview {
+    max-width: 620px; margin: 0 auto 10px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(232,197,107,0.28);
+    border-radius: 10px;
+    font-family: 'Caveat', cursive; font-size: 17px;
+    color: var(--ink-dim);
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .level-preview strong { color: var(--gold); font-family: 'Shadows Into Light', cursive; font-size: 20px; }
+  .level-empty {
+    text-align: center; font-family: 'Caveat', cursive;
+    color: var(--ink-muted); font-size: 18px; padding: 12px 0;
+  }
+
 
   .summary-card {
     max-width: 480px; margin: 6px auto 14px;
@@ -939,9 +992,23 @@
   ];
 
 
-  const QUIZ_LENGTH = 5;      // questions per level
+  const QUIZ_LENGTH = 5;      // base questions per level
   const TOTAL_LEVELS = 100;
-  const TIMER_SECONDS = 20;   // per question countdown
+  const TIMER_SECONDS = 20;   // base per-question countdown
+
+  // Levels get gradually longer and (per difficulty) tighter on time.
+  function questionsForLevel(level) {
+    if (level <= 25) return 5;
+    if (level <= 50) return 6;
+    if (level <= 75) return 7;
+    return 8;
+  }
+  function timerForLevel(diffKey, level) {
+    const base = diffKey === "easy" ? 25 : diffKey === "hard" ? 15 : 20;
+    const step = Math.floor((level - 1) / 25); // 0..3
+    return Math.max(8, base - step * 2);
+  }
+
 
   // ---- State (in-memory only) ----
   let questions = [];
@@ -1106,7 +1173,7 @@
     const catsKey = Array.from(selectedCategories).sort().join("|");
     const seed = hashStr(diffKey + "#" + catsKey + "#L" + level);
     const shuffled = seededShuffle(pool, seed);
-    const need = Math.min(QUIZ_LENGTH, Math.max(3, pool.length));
+    const need = Math.min(questionsForLevel(level), Math.max(3, pool.length));
     const out = [];
     for (let i = 0; i < need; i++) {
       out.push(shuffled[(i + (level - 1) * 2) % shuffled.length]);
@@ -1240,41 +1307,147 @@
     const hr = el("hr", { class: "rule" });
 
     const header = el("div", { class: "level-header" }, [
-      el("span", { text: "50 rounds of 5 questions" }),
+      el("span", { text: TOTAL_LEVELS + " rounds · length & timer scale up" }),
       el("span", {}, [
         document.createTextNode("Unlocked: "),
         el("strong", { text: unlocked[difficulty] + " / " + TOTAL_LEVELS })
       ])
     ]);
 
+    // Search
+    const searchInput = el("input", {
+      attrs: {
+        type: "search",
+        inputmode: "numeric",
+        placeholder: "Search levels (e.g. 42, 1-25, cleared, current, locked)…",
+        "aria-label": "Search levels"
+      }
+    });
+    const clearBtn = el("button", {
+      class: "clear-btn", text: "Clear",
+      attrs: { type: "button" },
+      on: { click: () => { searchInput.value = ""; applyFilter(); searchInput.focus(); } }
+    });
+    const search = el("div", { class: "level-search" }, [searchInput, clearBtn]);
+
+    // Preview panel
+    const preview = el("div", {
+      class: "level-preview",
+      attrs: { id: "level-preview", "aria-live": "polite" }
+    });
+
     const pool = filteredPool(difficulty);
     const grid = el("div", { class: "level-grid", attrs: { role: "list", "aria-label": "Levels" } });
+    const empty = el("p", { class: "level-empty hidden", text: "No levels match that search." });
+
+    const tiles = [];
     for (let lv = 1; lv <= TOTAL_LEVELS; lv++) {
       const isUnlocked = lv <= unlocked[difficulty] && pool.length > 0;
       const isCleared = lv < unlocked[difficulty];
       const isCurrent = lv === unlocked[difficulty] && pool.length > 0;
+      const qs = questionsForLevel(lv);
+      const secs = timerForLevel(difficulty, lv);
       const b = el("button", {
         class: "level-btn" + (isCleared ? " cleared" : "") + (isCurrent ? " current" : ""),
-        text: String(lv),
-        attrs: { type: "button", "aria-label": "Level " + lv, ...(isUnlocked ? {} : { disabled: "true" }) },
-        on: { click: () => { if (!isUnlocked) return; currentLevel = lv; startGame(); } }
-      });
+        attrs: {
+          type: "button",
+          "aria-label": "Level " + lv + " — " + qs + " questions, " + secs + " seconds each",
+          title: "Level " + lv + " · " + qs + " Qs · " + secs + "s each",
+          ...(isUnlocked ? {} : { disabled: "true" })
+        },
+        on: {
+          click: () => { if (!isUnlocked) return; currentLevel = lv; startGame(); },
+          mouseenter: () => showPreview(lv, isUnlocked, isCleared, isCurrent),
+          focus: () => showPreview(lv, isUnlocked, isCleared, isCurrent)
+        }
+      }, [
+        el("span", { class: "lv-num", text: String(lv) }),
+        el("span", { class: "lv-meta", text: qs + "Q·" + secs + "s" })
+      ]);
+      b.dataset.level = String(lv);
+      b.dataset.state = isCleared ? "cleared" : isCurrent ? "current" : isUnlocked ? "unlocked" : "locked";
+      tiles.push(b);
       grid.appendChild(b);
     }
+
+    function showPreview(lv, isUnlocked, isCleared, isCurrent) {
+      const qs = questionsForLevel(lv);
+      const secs = timerForLevel(difficulty, lv);
+      const status = isCleared ? "Cleared" : isCurrent ? "Current" : isUnlocked ? "Ready" : "Locked";
+      preview.replaceChildren(
+        el("span", {}, [
+          document.createTextNode("Level "),
+          el("strong", { text: String(lv) }),
+          document.createTextNode(" · " + status)
+        ]),
+        el("span", {}, [
+          el("strong", { text: String(qs) }),
+          document.createTextNode(" questions")
+        ]),
+        el("span", {}, [
+          el("strong", { text: secs + "s" }),
+          document.createTextNode(" per question")
+        ])
+      );
+    }
+    // Default preview = current level (or level 1)
+    const focusLv = Math.min(unlocked[difficulty] || 1, TOTAL_LEVELS);
+    showPreview(focusLv, focusLv <= unlocked[difficulty] && pool.length > 0, focusLv < unlocked[difficulty], focusLv === unlocked[difficulty]);
+
+    function applyFilter() {
+      const raw = (searchInput.value || "").trim().toLowerCase();
+      let match;
+      if (!raw) {
+        match = () => true;
+      } else {
+        const rangeM = raw.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+        const numM = raw.match(/^\d+$/);
+        if (rangeM) {
+          const lo = Math.min(+rangeM[1], +rangeM[2]);
+          const hi = Math.max(+rangeM[1], +rangeM[2]);
+          match = (lv, state) => lv >= lo && lv <= hi;
+        } else if (numM) {
+          const n = +numM;
+          match = (lv) => String(lv).includes(raw);
+        } else if (["cleared", "current", "unlocked", "locked", "ready"].includes(raw)) {
+          const target = raw === "ready" ? "unlocked" : raw;
+          match = (lv, state) => state === target;
+        } else {
+          match = () => false;
+        }
+      }
+      let shown = 0;
+      let firstVisible = null;
+      tiles.forEach(t => {
+        const lv = +t.dataset.level;
+        const ok = match(lv, t.dataset.state);
+        t.classList.toggle("hidden", !ok);
+        if (ok) { shown++; if (firstVisible == null) firstVisible = lv; }
+      });
+      empty.classList.toggle("hidden", shown !== 0);
+      if (firstVisible != null) {
+        const lv = firstVisible;
+        const isUnlocked = lv <= unlocked[difficulty] && pool.length > 0;
+        showPreview(lv, isUnlocked, lv < unlocked[difficulty], lv === unlocked[difficulty] && pool.length > 0);
+      }
+    }
+    searchInput.addEventListener("input", applyFilter);
 
     const hint = el("p", {
       class: "level-hint",
       text: pool.length === 0
         ? "No questions match your category picks for this difficulty — go back and add a category."
-        : "Clear a level to unlock the next. Answers shuffle every round."
+        : "Clear a level to unlock the next. Search by number, range (e.g. 20-40), or status."
     });
 
     const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
       el("button", { class: "btn ghost", text: "← Change menu", on: { click: renderCategories } })
     ]);
 
-    board.append(nav, title, sub, hr, header, grid, hint, actions);
+    board.append(nav, title, sub, hr, header, search, preview, grid, empty, hint, actions);
   }
+
+
 
 
   function startGame() {
@@ -1332,7 +1505,7 @@
     timerBar.appendChild(timerFill);
     const timerText = el("div", { class: "timer-text" }, [
       el("span", { text: "Time left" }),
-      el("span", { class: "clock", attrs: { id: "timer-clock" }, text: TIMER_SECONDS + "s" })
+      el("span", { class: "clock", attrs: { id: "timer-clock" }, text: timerForLevel(difficulty, currentLevel) + "s" })
     ]);
     timerWrap.append(timerBar, timerText);
 
@@ -1369,7 +1542,7 @@
 
   function startTimer() {
     stopTimer();
-    timeLeft = TIMER_SECONDS;
+    timeLeft = timerForLevel(difficulty, currentLevel);
     updateTimerUI();
     timerId = setInterval(() => {
       timeLeft -= 1;
@@ -1389,7 +1562,7 @@
     const fill = document.getElementById("timer-fill");
     const clock = document.getElementById("timer-clock");
     if (!fill || !clock) return;
-    const pct = Math.max(0, timeLeft) / TIMER_SECONDS;
+    const pct = Math.max(0, timeLeft) / timerForLevel(difficulty, currentLevel);
     fill.style.transform = "scaleX(" + pct + ")";
     fill.classList.toggle("warn", timeLeft <= 10 && timeLeft > 5);
     fill.classList.toggle("danger", timeLeft <= 5);
@@ -1549,7 +1722,7 @@
     }));
 
     const noteText = timedOut
-      ? "You had " + TIMER_SECONDS + " seconds per question — the timer beat you this time."
+      ? "You had " + timerForLevel(difficulty, currentLevel) + " seconds per question — the timer beat you this time."
       : (isLastLevel && passed
         ? "You cleared every level on " + difficulty + " — chef's hat earned! 🎩"
         : (newlyUnlocked ? ("Level " + (currentLevel + 1) + " unlocked!") : "Score 60% or higher to unlock the next level."));
