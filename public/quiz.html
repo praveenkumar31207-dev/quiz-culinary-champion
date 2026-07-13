@@ -1616,7 +1616,7 @@
     }));
 
     const noteText = timedOut
-      ? "You had " + TIMER_SECONDS + " seconds per question — the timer beat you this time."
+      ? "You had " + timerForLevel(difficulty, currentLevel) + " seconds per question — the timer beat you this time."
       : (isLastLevel && passed
         ? "You cleared every level on " + difficulty + " — chef's hat earned! 🎩"
         : (newlyUnlocked ? ("Level " + (currentLevel + 1) + " unlocked!") : "Score 60% or higher to unlock the next level."));
