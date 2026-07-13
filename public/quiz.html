@@ -191,6 +191,21 @@
     box-shadow: none;
   }
   .btn.ghost:hover { background: rgba(232,197,107,0.10); }
+  .mute-btn {
+    appearance: none;
+    background: rgba(232,197,107,0.08);
+    color: var(--gold);
+    border: 1px solid rgba(232,197,107,0.35);
+    border-radius: 999px;
+    padding: 9px 14px;
+    font: 600 13px/1 'Inter', system-ui, sans-serif;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
+  }
+  .mute-btn:hover { background: rgba(232,197,107,0.16); border-color: rgba(232,197,107,0.55); transform: translateY(-2px); }
+  .mute-btn[aria-pressed="true"] { opacity: 0.75; }
+  .mute-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   .center { text-align: center; }
 
   .meta-row {
@@ -955,6 +970,72 @@
 
   const board = document.getElementById("board");
 
+  // ---- Sound (Web Audio, no assets) ----
+  const SFX_KEY = "foodTrivia.muted";
+  let muted = (function () {
+    try { return localStorage.getItem(SFX_KEY) === "1"; } catch (_) { return false; }
+  })();
+  let audioCtx = null;
+  function getCtx() {
+    if (muted) return null;
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      try { audioCtx = new AC(); } catch (_) { return null; }
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+    return audioCtx;
+  }
+  function tone(freq, dur, when, type, gain) {
+    const ctx = getCtx(); if (!ctx) return;
+    const t0 = ctx.currentTime + (when || 0);
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(gain || 0.12, t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(t0); osc.stop(t0 + dur + 0.02);
+  }
+  function playCorrect() {
+    // Gentle two-note chime (E5 → A5)
+    tone(659.25, 0.18, 0,    "sine",     0.10);
+    tone(880.00, 0.28, 0.09, "triangle", 0.10);
+  }
+  function playWrong() {
+    // Soft downward buzz (A3 → E3)
+    tone(220.00, 0.18, 0,    "sine",     0.09);
+    tone(164.81, 0.28, 0.08, "sine",     0.09);
+  }
+  function setMuted(v) {
+    muted = !!v;
+    try { localStorage.setItem(SFX_KEY, muted ? "1" : "0"); } catch (_) {}
+    const btn = document.getElementById("mute-btn");
+    if (btn) {
+      btn.textContent = muted ? "🔇 Sound off" : "🔊 Sound on";
+      btn.setAttribute("aria-pressed", muted ? "true" : "false");
+      btn.setAttribute("aria-label", muted ? "Unmute sound effects" : "Mute sound effects");
+    }
+  }
+  function makeMuteButton() {
+    const btn = el("button", {
+      class: "mute-btn",
+      attrs: {
+        id: "mute-btn",
+        type: "button",
+        "aria-pressed": muted ? "true" : "false",
+        "aria-label": muted ? "Unmute sound effects" : "Mute sound effects",
+        title: "Toggle sound effects"
+      },
+      text: muted ? "🔇 Sound off" : "🔊 Sound on",
+      on: { click: () => setMuted(!muted) }
+    });
+    return btn;
+  }
+
+
   // ---- Utilities ----
   function shuffle(arr) {
     const a = arr.slice();
@@ -1064,7 +1145,8 @@
 
     const actions = el("div", { class: "actions", attrs: { style: "display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" } }, [
       el("button", { class: "btn", text: "Start Cooking →", on: { click: renderCategories } }),
-      el("button", { class: "btn ghost", text: "Jump to Levels", on: { click: renderLevels } })
+      el("button", { class: "btn ghost", text: "Jump to Levels", on: { click: renderLevels } }),
+      makeMuteButton()
     ]);
 
     const note = el("p", { class: "footer-note", text: "Tip: clear a level to unlock the next. Score at least 60%." });
@@ -1321,6 +1403,7 @@
     // Mark the current question as wrong (no selection)
     const q = questions[currentIndex];
     results.push({ correct: false, selectedIdx: null, question: q });
+    playWrong();
     // End the round immediately — time ran out
     renderResults(true);
   }
@@ -1332,6 +1415,7 @@
     const isCorrect = selectedIdx === q.answer;
     if (isCorrect) score += 1;
     results.push({ correct: isCorrect, selectedIdx, question: q });
+    if (isCorrect) playCorrect(); else playWrong();
 
     buttons.forEach((btn, i) => {
       btn.disabled = true;
