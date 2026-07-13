@@ -1399,7 +1399,7 @@
     timerBar.appendChild(timerFill);
     const timerText = el("div", { class: "timer-text" }, [
       el("span", { text: "Time left" }),
-      el("span", { class: "clock", attrs: { id: "timer-clock" }, text: TIMER_SECONDS + "s" })
+      el("span", { class: "clock", attrs: { id: "timer-clock" }, text: timerForLevel(difficulty, currentLevel) + "s" })
     ]);
     timerWrap.append(timerBar, timerText);
 
