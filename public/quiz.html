@@ -1725,6 +1725,49 @@
       ]);
       card.appendChild(selectedRow);
       card.appendChild(correctRow);
+
+      const whyRow = el("div", { class: "why-row" });
+      const whyBtn = el("button", {
+        class: "why-btn",
+        text: "✨ Why?",
+        attrs: { "aria-label": "Explain the correct answer with AI" }
+      });
+      const whyOut = el("div", { class: "why-text", attrs: { style: "display:none;" } });
+      whyBtn.addEventListener("click", async () => {
+        if (whyBtn.dataset.loaded === "1") return;
+        whyBtn.disabled = true;
+        whyBtn.textContent = "Thinking…";
+        whyOut.style.display = "";
+        whyOut.classList.remove("error");
+        whyOut.textContent = "…";
+        try {
+          const res = await fetch("/api/explain", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              question: q.question,
+              correctAnswer: q.options[q.answer],
+              category: q.category || ""
+            })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.explanation) {
+            throw new Error(data.error || "AI unavailable");
+          }
+          whyOut.textContent = data.explanation;
+          whyBtn.textContent = "✓ Explained";
+          whyBtn.dataset.loaded = "1";
+        } catch (err) {
+          whyOut.classList.add("error");
+          whyOut.textContent = (err && err.message) ? err.message : "Couldn't fetch explanation.";
+          whyBtn.disabled = false;
+          whyBtn.textContent = "✨ Try again";
+        }
+      });
+      whyRow.appendChild(whyBtn);
+      whyRow.appendChild(whyOut);
+      card.appendChild(whyRow);
+
       review.appendChild(card);
     });
 
