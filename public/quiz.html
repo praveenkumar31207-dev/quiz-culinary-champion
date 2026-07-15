@@ -419,6 +419,32 @@
   .review-row .value { color: var(--ink); }
   .review-row .selected { color: var(--crimson); }
   .review-row.correct-answer .value { color: var(--leaf); }
+  .why-row { margin-top: 8px; display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+  .why-btn {
+    font-family: 'Special Elite', monospace;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(232,197,107,0.12);
+    border: 1px solid rgba(232,197,107,0.5);
+    color: var(--gold);
+    cursor: pointer;
+    transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
+  }
+  .why-btn:hover:not(:disabled) { background: rgba(232,197,107,0.22); border-color: var(--gold); transform: translateY(-1px); }
+  .why-btn:disabled { opacity: 0.6; cursor: default; }
+  .why-text {
+    font-family: 'Caveat', cursive;
+    font-size: 17px;
+    line-height: 1.35;
+    color: var(--ink);
+    background: rgba(232,197,107,0.06);
+    border-left: 2px solid var(--gold);
+    padding: 6px 10px;
+    border-radius: 6px;
+    flex: 1 1 100%;
+  }
+  .why-text.error { color: var(--crimson); border-left-color: var(--crimson); background: rgba(255,84,104,0.06); }
 
   /* Page navigation */
   .page-nav {
