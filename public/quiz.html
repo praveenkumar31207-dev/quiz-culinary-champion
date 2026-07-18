@@ -1311,6 +1311,7 @@
             } else {
               selectedCategories.add(name);
             }
+            saveCategories();
             renderCategories();
           }
         }
@@ -1318,9 +1319,10 @@
       catWrap.appendChild(chip);
     });
     const catActions = el("div", { class: "cat-actions" }, [
-      el("button", { class: "mini", text: "Select all", on: { click: () => { ALL_CATEGORIES.forEach(c => selectedCategories.add(c)); renderCategories(); } } }),
-      el("button", { class: "mini", text: "Only one", on: { click: () => { selectedCategories = new Set([ALL_CATEGORIES[0]]); renderCategories(); } } })
+      el("button", { class: "mini", text: "Select all", on: { click: () => { ALL_CATEGORIES.forEach(c => selectedCategories.add(c)); saveCategories(); renderCategories(); } } }),
+      el("button", { class: "mini", text: "Only one", on: { click: () => { selectedCategories = new Set([ALL_CATEGORIES[0]]); saveCategories(); renderCategories(); } } })
     ]);
+
 
     // Difficulty picker
     const diffLabel = el("p", { class: "diff-label", text: "Choose your difficulty" });
