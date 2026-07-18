@@ -1051,9 +1051,47 @@
     "Baking & Desserts", "Beverages", "Fruits & Vegetables",
     "Seafood", "Street Food", "Herbs & Spices"
   ];
-  let selectedCategories = new Set(ALL_CATEGORIES);
-  // Highest level unlocked per difficulty (session only)
-  const unlocked = { easy: 1, medium: 1, hard: 1 };
+  // ---- Local persistence ----
+  const LS = {
+    unlocked: "foodTrivia.unlocked",
+    cats:     "foodTrivia.categories",
+    diff:     "foodTrivia.difficulty",
+    scores:   "foodTrivia.highScores"
+  };
+  function lsGet(k, fallback) {
+    try { const v = localStorage.getItem(k); return v == null ? fallback : JSON.parse(v); }
+    catch (_) { return fallback; }
+  }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} }
+
+  const savedUnlocked = lsGet(LS.unlocked, null);
+  const unlocked = (savedUnlocked && typeof savedUnlocked === "object")
+    ? { easy: +savedUnlocked.easy || 1, medium: +savedUnlocked.medium || 1, hard: +savedUnlocked.hard || 1 }
+    : { easy: 1, medium: 1, hard: 1 };
+  const savedCats = lsGet(LS.cats, null);
+  let selectedCategories = new Set(
+    Array.isArray(savedCats) && savedCats.length
+      ? savedCats.filter(c => ALL_CATEGORIES.includes(c))
+      : ALL_CATEGORIES
+  );
+  if (!selectedCategories.size) selectedCategories = new Set(ALL_CATEGORIES);
+  const savedDiff = lsGet(LS.diff, null);
+  if (savedDiff === "easy" || savedDiff === "medium" || savedDiff === "hard") difficulty = savedDiff;
+  // High scores: { "easy:1": 85, ... }
+  let highScores = lsGet(LS.scores, {}) || {};
+  function saveUnlocked() { lsSet(LS.unlocked, unlocked); }
+  function saveCategories() { lsSet(LS.cats, Array.from(selectedCategories)); }
+  function saveDifficulty() { lsSet(LS.diff, difficulty); }
+  function recordScore(diff, level, pct) {
+    const k = diff + ":" + level;
+    if (!highScores[k] || pct > highScores[k]) {
+      highScores[k] = pct;
+      lsSet(LS.scores, highScores);
+      return true;
+    }
+    return false;
+  }
+
 
   const DIFFICULTIES = [
     { key: "easy",   label: "Easy",   blurb: "Warm‑up bites" },
