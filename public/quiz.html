@@ -1332,7 +1332,7 @@
       const btn = el("button", {
         class: "diff-btn" + (d.key === difficulty ? " selected" : ""),
         attrs: { type: "button", "data-diff": d.key, "aria-pressed": d.key === difficulty ? "true" : "false" },
-        on: { click: () => { difficulty = d.key; renderCategories(); } }
+        on: { click: () => { difficulty = d.key; saveDifficulty(); renderCategories(); } }
       }, [
         el("span", { class: "diff-name", text: d.label }),
         el("span", { class: "diff-blurb", text: d.blurb }),
