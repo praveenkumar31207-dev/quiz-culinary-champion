@@ -1730,6 +1730,12 @@
     big.appendChild(el("small", { text: ` (${correct}/${total})` }));
 
     const v = el("p", { class: "verdict", text: verdict });
+    const best = highScores[difficulty + ":" + currentLevel];
+    const hsText = best != null
+      ? (isNewHigh ? "🏆 New best: " + best + "%" : "Best: " + best + "%")
+      : "";
+    const hs = el("p", { class: "verdict", text: hsText });
+    hs.style.opacity = "0.8"; hs.style.fontSize = "0.95em";
 
     const stats = el("div", { class: "stat-row" }, [
       el("div", { class: "stat total" }, [
