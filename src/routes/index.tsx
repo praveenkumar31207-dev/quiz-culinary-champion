@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
@@ -67,6 +68,20 @@ function Index() {
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden" }}>
+      <div
+        style={{
+          position: "fixed",
+          top: 10,
+          left: 10,
+          zIndex: 10,
+          display: "flex",
+          gap: 6,
+          fontFamily: "'Special Elite', ui-monospace, Menlo, monospace",
+        }}
+      >
+        <Link to="/learn" style={navPill}>📖 Foods</Link>
+        <Link to="/cuisines" style={navPill}>🌍 Cuisines</Link>
+      </div>
       <div
         style={{
           position: "fixed",
@@ -159,6 +174,18 @@ function Index() {
     </div>
   );
 }
+
+const navPill: React.CSSProperties = {
+  padding: "6px 12px",
+  borderRadius: 999,
+  background: "rgba(15,20,18,0.72)",
+  border: "1px solid rgba(232,197,107,0.45)",
+  color: "#f4e8c1",
+  textDecoration: "none",
+  fontSize: 13,
+  backdropFilter: "blur(6px)",
+  WebkitBackdropFilter: "blur(6px)",
+};
 
 const authBtn: React.CSSProperties = {
   display: "inline-flex",

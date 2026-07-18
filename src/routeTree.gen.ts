@@ -9,9 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LearnRouteImport } from './routes/learn'
+import { Route as CuisinesRouteImport } from './routes/cuisines'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiExplainRouteImport } from './routes/api/explain'
 
+const LearnRoute = LearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuisinesRoute = CuisinesRouteImport.update({
+  id: '/cuisines',
+  path: '/cuisines',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -25,32 +37,54 @@ const ApiExplainRoute = ApiExplainRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cuisines': typeof CuisinesRoute
+  '/learn': typeof LearnRoute
   '/api/explain': typeof ApiExplainRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cuisines': typeof CuisinesRoute
+  '/learn': typeof LearnRoute
   '/api/explain': typeof ApiExplainRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cuisines': typeof CuisinesRoute
+  '/learn': typeof LearnRoute
   '/api/explain': typeof ApiExplainRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/explain'
+  fullPaths: '/' | '/cuisines' | '/learn' | '/api/explain'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/explain'
-  id: '__root__' | '/' | '/api/explain'
+  to: '/' | '/cuisines' | '/learn' | '/api/explain'
+  id: '__root__' | '/' | '/cuisines' | '/learn' | '/api/explain'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CuisinesRoute: typeof CuisinesRoute
+  LearnRoute: typeof LearnRoute
   ApiExplainRoute: typeof ApiExplainRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/learn': {
+      id: '/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuisines': {
+      id: '/cuisines'
+      path: '/cuisines'
+      fullPath: '/cuisines'
+      preLoaderRoute: typeof CuisinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -70,6 +104,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CuisinesRoute: CuisinesRoute,
+  LearnRoute: LearnRoute,
   ApiExplainRoute: ApiExplainRoute,
 }
 export const routeTree = rootRouteImport
