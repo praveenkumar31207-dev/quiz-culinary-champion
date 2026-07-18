@@ -1706,12 +1706,15 @@
     const passed = !timedOut && pct >= 60; // time-out ends the round without pass
     const isLastLevel = currentLevel >= TOTAL_LEVELS;
 
-    // Unlock next level on pass
+    // Unlock next level on pass + record high score
     let newlyUnlocked = false;
     if (passed && !isLastLevel && unlocked[difficulty] === currentLevel) {
       unlocked[difficulty] = currentLevel + 1;
+      saveUnlocked();
       newlyUnlocked = true;
     }
+    const isNewHigh = !timedOut && recordScore(difficulty, currentLevel, pct);
+
 
     let verdict;
     if (timedOut) verdict = "⏰ Time's up! The round ended — try again to clear this level.";
