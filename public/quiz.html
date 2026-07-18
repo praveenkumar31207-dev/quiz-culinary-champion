@@ -1846,7 +1846,7 @@
         : (newlyUnlocked ? ("Level " + (currentLevel + 1) + " unlocked!") : "Score 60% or higher to unlock the next level."));
     const note = el("p", { class: "footer-note", text: noteText });
 
-    board.append(title, big, v, stats, review, actions, note);
+    board.append(title, big, v, ...(hsText ? [hs] : []), stats, review, actions, note);
   }
 
   // Boot
