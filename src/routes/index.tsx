@@ -72,6 +72,20 @@ function Index() {
         style={{
           position: "fixed",
           top: 10,
+          left: 10,
+          zIndex: 10,
+          display: "flex",
+          gap: 6,
+          fontFamily: "'Special Elite', ui-monospace, Menlo, monospace",
+        }}
+      >
+        <Link to="/learn" style={navPill}>📖 Foods</Link>
+        <Link to="/cuisines" style={navPill}>🌍 Cuisines</Link>
+      </div>
+      <div
+        style={{
+          position: "fixed",
+          top: 10,
           right: 10,
           zIndex: 10,
           display: "flex",
