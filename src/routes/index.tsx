@@ -175,6 +175,18 @@ function Index() {
   );
 }
 
+const navPill: React.CSSProperties = {
+  padding: "6px 12px",
+  borderRadius: 999,
+  background: "rgba(15,20,18,0.72)",
+  border: "1px solid rgba(232,197,107,0.45)",
+  color: "#f4e8c1",
+  textDecoration: "none",
+  fontSize: 13,
+  backdropFilter: "blur(6px)",
+  WebkitBackdropFilter: "blur(6px)",
+};
+
 const authBtn: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
